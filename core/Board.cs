@@ -47,15 +47,18 @@ namespace Biasfish.Core
         public void LoadFEN(string fenString)
         {
             // clear bitboards
+            occupiedWhite = 0;
+            occupiedBlack = 0;
+            occupiedAll = 0;
             foreach (int pieceType in Piece.PieceTypes)
             {
-                SetBitboard(pieceType, 0);
+                Set(pieceType, 0);
             }
 
             // parse parts
             string[] fenParts = fenString.Split(' ');
             string fenBoard = fenParts[0];
-            sideToMove = fenParts[1] == "w" ? Colors.White : Colors.Black;
+            sideToMove = fenParts[1] == "w" ? Piece.White : Piece.Black;
 
             // parse fenBoard starting at the top left moving rightwards
             int rank = 7;
@@ -77,25 +80,30 @@ namespace Biasfish.Core
                 {
                     // convert the symbol into a piece type
                     int pieceType = SymbolToPieceType(symbol);
+                    int pieceColor = Piece.GetColor(pieceType);
                     int square = rank * 8 + file;
 
-                    SetBitboard(pieceType, GetBitboard(pieceType) | (1UL << square));
+                    Set(pieceType, Get(pieceType) | (1UL << square));
+                    Set(pieceColor, Get(pieceColor) | (1UL << square));
+                    occupiedAll |= 1UL << square;
 
                     file++;
                 }
             }
         }
 
-        public ulong GetBitboard(int pieceType)
+        public ulong Get(int pieceType)
         {
             switch (pieceType)
             {
+                case Piece.White:        return occupiedWhite;
                 case Piece.WhitePawns:   return whitePawns;
                 case Piece.WhiteKnights: return whiteKnights;
                 case Piece.WhiteBishops: return whiteBishops;
                 case Piece.WhiteRooks:   return whiteRooks;
                 case Piece.WhiteQueens:  return whiteQueens;
                 case Piece.WhiteKings:   return whiteKings;
+                case Piece.Black:        return occupiedBlack;
                 case Piece.BlackPawns:   return blackPawns;
                 case Piece.BlackKnights: return blackKnights;
                 case Piece.BlackBishops: return blackBishops;
@@ -106,22 +114,24 @@ namespace Biasfish.Core
             }
         }
 
-        public void SetBitboard(int pieceType, ulong value)
+        public void Set(int pieceType, ulong value)
         {
             switch (pieceType)
             {
-                case Piece.WhitePawns:   whitePawns   = value; return;
-                case Piece.WhiteKnights: whiteKnights = value; return;
-                case Piece.WhiteBishops: whiteBishops = value; return;
-                case Piece.WhiteRooks:   whiteRooks   = value; return;
-                case Piece.WhiteQueens:  whiteQueens  = value; return;
-                case Piece.WhiteKings:   whiteKings   = value; return;
-                case Piece.BlackPawns:   blackPawns   = value; return;
-                case Piece.BlackKnights: blackKnights = value; return;
-                case Piece.BlackBishops: blackBishops = value; return;
-                case Piece.BlackRooks:   blackRooks   = value; return;
-                case Piece.BlackQueens:  blackQueens  = value; return;
-                case Piece.BlackKings:   blackKings   = value; return;
+                case Piece.White:        occupiedWhite = value; return;
+                case Piece.WhitePawns:   whitePawns    = value; return;
+                case Piece.WhiteKnights: whiteKnights  = value; return;
+                case Piece.WhiteBishops: whiteBishops  = value; return;
+                case Piece.WhiteRooks:   whiteRooks    = value; return;
+                case Piece.WhiteQueens:  whiteQueens   = value; return;
+                case Piece.WhiteKings:   whiteKings    = value; return;
+                case Piece.Black:        occupiedBlack = value; return;
+                case Piece.BlackPawns:   blackPawns    = value; return;
+                case Piece.BlackKnights: blackKnights  = value; return;
+                case Piece.BlackBishops: blackBishops  = value; return;
+                case Piece.BlackRooks:   blackRooks    = value; return;
+                case Piece.BlackQueens:  blackQueens   = value; return;
+                case Piece.BlackKings:   blackKings    = value; return;
             }
         }
     }

@@ -19,7 +19,7 @@ namespace Biasfish.Core
                     bool pieceFound = false;
                     foreach (int pieceType in Piece.PieceTypes)
                     {
-                        ulong bitboard = board.GetBitboard(pieceType);
+                        ulong bitboard = board.Get(pieceType);
 
                         if ((bitboard & (1UL << square)) != 0)
                         {
@@ -36,7 +36,7 @@ namespace Biasfish.Core
                 }
                 Console.WriteLine("\n  +---+---+---+---+---+---+---+---+");
             }
-            Console.WriteLine("    A   B   C   D   E   F   G   H    ");
+            Console.WriteLine("    a   b   c   d   e   f   g   h   ");
         }
 
         public static void PrintBB(ulong bitboard)
