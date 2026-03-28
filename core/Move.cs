@@ -5,8 +5,8 @@ namespace Biasfish.Core
         private readonly ushort value;
 
         public int FromSquare => value & 0b111111;
-        public int ToSquare => value & 0b111111000000;
-        public int Flags => value & 0b1111000000000000;
+        public int ToSquare => (value >> 6) & 0b111111;
+        public int Flags => (value >> 12) & 0b1111;
         public ushort Value => value;
 
         public Move(int fromSquare, int toSquare, int flags = 0)

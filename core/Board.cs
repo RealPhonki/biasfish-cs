@@ -40,7 +40,7 @@ namespace Biasfish.Core
                 'r' => Piece.BlackRooks,
                 'q' => Piece.BlackQueens,
                 'k' => Piece.BlackKings,
-                _ => throw new ArgumentException($"Invalid FEN character {symbol}")
+                _ => throw new ArgumentException($"Invalid FEN character: {symbol}")
             };
         }
 
@@ -52,7 +52,7 @@ namespace Biasfish.Core
             occupiedAll = 0;
             foreach (int pieceType in Piece.PieceTypes)
             {
-                Set(pieceType, 0);
+                SetBitboard(pieceType, 0);
             }
 
             // parse parts
@@ -83,8 +83,8 @@ namespace Biasfish.Core
                     int pieceColor = Piece.GetColor(pieceType);
                     int square = rank * 8 + file;
 
-                    Set(pieceType, Get(pieceType) | (1UL << square));
-                    Set(pieceColor, Get(pieceColor) | (1UL << square));
+                    SetBitboard(pieceType, GetBitboard(pieceType) | (1UL << square));
+                    SetBitboard(pieceColor, GetBitboard(pieceColor) | (1UL << square));
                     occupiedAll |= 1UL << square;
 
                     file++;
@@ -92,7 +92,37 @@ namespace Biasfish.Core
             }
         }
 
-        public ulong Get(int pieceType)
+        public void Push(Move move)
+        {
+            switch (move.Flags)
+            {
+                case 0:
+                    int pieceType = PieceAt(move.FromSquare);
+                    int pieceColor = Piece.GetColor(pieceType);
+                    SetBitboard(pieceType, GetBitboard(pieceType) ^ (1UL << move.FromSquare | 1UL << move.ToSquare));
+                    SetBitboard(pieceColor, GetBitboard(pieceColor) ^ (1UL << move.FromSquare | 1UL << move.ToSquare));
+                    occupiedAll ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+                    return;
+            }
+        }
+
+        public int PieceAt(int square)
+        {
+            if ((occupiedAll & (1UL << square)) == 0)
+            {
+                return Piece.None;
+            }
+            foreach (int pieceType in Piece.PieceTypes)
+            {
+                if ((GetBitboard(pieceType) & (1UL << square)) != 0)
+                {
+                    return pieceType;
+                }
+            }
+            throw new InvalidOperationException($"Invalid PieceAt({square}): Occupancy bitboards are not synced.");
+        }
+
+        public ulong GetBitboard(int pieceType)
         {
             switch (pieceType)
             {
@@ -114,7 +144,7 @@ namespace Biasfish.Core
             }
         }
 
-        public void Set(int pieceType, ulong value)
+        public void SetBitboard(int pieceType, ulong value)
         {
             switch (pieceType)
             {
