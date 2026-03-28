@@ -6,10 +6,11 @@ namespace Biasfish
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Board testBoard = new Board();
-            Console.WriteLine(testBoard);
+            testBoard.SetBitboard(Piece.WhitePawns, 809412089);
+            Debug.PrintBoard(testBoard);
         }
     }
 }

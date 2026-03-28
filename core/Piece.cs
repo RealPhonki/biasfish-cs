@@ -2,6 +2,7 @@ namespace Biasfish.Core
 {
     public static class Piece
     {
+        public static readonly int[] PieceTypes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         public const int WhitePawns = 0;
         public const int WhiteKnights = 1;
         public const int WhiteBishops = 2;
