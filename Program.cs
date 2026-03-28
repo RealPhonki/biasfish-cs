@@ -9,12 +9,7 @@ namespace Biasfish
         public static void Main(string[] args)
         {
             Board testBoard = new Board();
-            testBoard.SetBitboard(Piece.WhitePawns, 65280);
-            testBoard.SetBitboard(Piece.WhiteKnights,  66);
-            testBoard.SetBitboard(Piece.WhiteBishops,  36);
-            testBoard.SetBitboard(Piece.WhiteRooks,   129);
-            testBoard.SetBitboard(Piece.WhiteQueens,    8);
-            testBoard.SetBitboard(Piece.WhiteKings,    16);
+            testBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
             Debug.PrintBoard(testBoard);
         }
     }

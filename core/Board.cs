@@ -24,6 +24,68 @@ namespace Biasfish.Core
         public int halfMoveClock;
         public ulong key;
 
+        private static int SymbolToPieceType(char symbol)
+        {
+            return symbol switch
+            {
+                'P' => Piece.WhitePawns,
+                'N' => Piece.WhiteKnights,
+                'B' => Piece.WhiteBishops,
+                'R' => Piece.WhiteRooks,
+                'Q' => Piece.WhiteQueens,
+                'K' => Piece.WhiteKings,
+                'p' => Piece.BlackPawns,
+                'n' => Piece.BlackKnights,
+                'b' => Piece.BlackBishops,
+                'r' => Piece.BlackRooks,
+                'q' => Piece.BlackQueens,
+                'k' => Piece.BlackKings,
+                _ => throw new ArgumentException($"Invalid FEN character {symbol}")
+            };
+        }
+
+        public void LoadFEN(string fenString)
+        {
+            // clear bitboards
+            foreach (int pieceType in Piece.PieceTypes)
+            {
+                SetBitboard(pieceType, 0);
+            }
+
+            // parse parts
+            string[] fenParts = fenString.Split(' ');
+            string fenBoard = fenParts[0];
+            sideToMove = fenParts[1] == "w" ? Colors.White : Colors.Black;
+
+            // parse fenBoard starting at the top left moving rightwards
+            int rank = 7;
+            int file = 0;
+            foreach (char symbol in fenBoard) 
+            {
+                if (symbol == '/')
+                {
+                    // skip to the next rank (row)
+                    rank--;
+                    file = 0;
+                }
+                else if (char.IsDigit(symbol))
+                {
+                    // convert the symbol into an integer and move rightwards by that amount
+                    file += symbol - '0';
+                }
+                else
+                {
+                    // convert the symbol into a piece type
+                    int pieceType = SymbolToPieceType(symbol);
+                    int square = rank * 8 + file;
+
+                    SetBitboard(pieceType, GetBitboard(pieceType) | (1UL << square));
+
+                    file++;
+                }
+            }
+        }
+
         public ulong GetBitboard(int pieceType)
         {
             switch (pieceType)
@@ -36,6 +98,7 @@ namespace Biasfish.Core
                 case Piece.WhiteKings:   return whiteKings;
                 case Piece.BlackPawns:   return blackPawns;
                 case Piece.BlackKnights: return blackKnights;
+                case Piece.BlackBishops: return blackBishops;
                 case Piece.BlackRooks:   return blackRooks;
                 case Piece.BlackQueens:  return blackQueens;
                 case Piece.BlackKings:   return blackKings;
@@ -55,6 +118,7 @@ namespace Biasfish.Core
                 case Piece.WhiteKings:   whiteKings   = value; return;
                 case Piece.BlackPawns:   blackPawns   = value; return;
                 case Piece.BlackKnights: blackKnights = value; return;
+                case Piece.BlackBishops: blackBishops = value; return;
                 case Piece.BlackRooks:   blackRooks   = value; return;
                 case Piece.BlackQueens:  blackQueens  = value; return;
                 case Piece.BlackKings:   blackKings   = value; return;
