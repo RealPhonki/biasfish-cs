@@ -33,6 +33,7 @@ namespace Biasfish.Core
                 case Piece.WhiteBishops: return whiteBishops;
                 case Piece.WhiteRooks:   return whiteRooks;
                 case Piece.WhiteQueens:  return whiteQueens;
+                case Piece.WhiteKings:   return whiteKings;
                 case Piece.BlackPawns:   return blackPawns;
                 case Piece.BlackKnights: return blackKnights;
                 case Piece.BlackRooks:   return blackRooks;
@@ -46,16 +47,17 @@ namespace Biasfish.Core
         {
             switch (pieceType)
             {
-                case Piece.WhitePawns:   whitePawns   = value; break;
-                case Piece.WhiteKnights: whiteKnights = value; break;
-                case Piece.WhiteBishops: whiteBishops = value; break;
-                case Piece.WhiteRooks:   whiteRooks   = value; break;
-                case Piece.WhiteQueens:  whiteQueens  = value; break;
-                case Piece.BlackPawns:   blackPawns   = value; break;
-                case Piece.BlackKnights: blackKnights = value; break;
-                case Piece.BlackRooks:   blackRooks   = value; break;
-                case Piece.BlackQueens:  blackQueens  = value; break;
-                case Piece.BlackKings:   blackKings   = value; break;
+                case Piece.WhitePawns:   whitePawns   = value; return;
+                case Piece.WhiteKnights: whiteKnights = value; return;
+                case Piece.WhiteBishops: whiteBishops = value; return;
+                case Piece.WhiteRooks:   whiteRooks   = value; return;
+                case Piece.WhiteQueens:  whiteQueens  = value; return;
+                case Piece.WhiteKings:   whiteKings   = value; return;
+                case Piece.BlackPawns:   blackPawns   = value; return;
+                case Piece.BlackKnights: blackKnights = value; return;
+                case Piece.BlackRooks:   blackRooks   = value; return;
+                case Piece.BlackQueens:  blackQueens  = value; return;
+                case Piece.BlackKings:   blackKings   = value; return;
             }
         }
     }
