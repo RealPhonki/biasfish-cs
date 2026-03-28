@@ -3,7 +3,7 @@ namespace Biasfish.Core
     public class Debug
     {
         public static readonly char[] PieceSymbols = {
-            'P', 'N', 'B', 'R', 'Q', 'K', 'p', 'n', 'b', 'r', 'q', 'k'
+            '♟', '♞', '♝', '♜', '♛', '♚', '♙', '♘', '♗', '♖', '♕', '♔'
         };
 
         public static void PrintBoard(Board board)
@@ -12,7 +12,7 @@ namespace Biasfish.Core
             for (int rank = 7; rank >= 0; rank--)
             {
                 Console.Write($"{rank + 1} | ");
-                for (int file = 7; file >= 0; file--)
+                for (int file = 0; file < 8; file++)
                 {
                     int square = rank * 8 + file;
 
@@ -31,7 +31,7 @@ namespace Biasfish.Core
 
                     if (!pieceFound)
                     {
-                        Console.Write(". | ");
+                        Console.Write("  | ");
                     }
                 }
                 Console.WriteLine("\n  +---+---+---+---+---+---+---+---+");
@@ -45,7 +45,7 @@ namespace Biasfish.Core
             for (int rank = 7; rank >= 0; rank--)
             {
                 Console.Write($"{rank} | ");
-                for (int file = 7; rank >= 0; rank--)
+                for (int file = 0; file < 8; file++)
                 {
                     int square = rank * 8 + file;
 
