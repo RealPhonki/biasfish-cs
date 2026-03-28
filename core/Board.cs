@@ -1,18 +1,27 @@
 namespace Biasfish.Core
 {
-    public class Board
+    public struct Board
     {
-        // bitboards[piece]
-        public ulong[] bitboards = new ulong[12];
-        // occupied[color]
-        public ulong[] occupied = new ulong[2];
-        public ulong occupiedAll = 0;
+        public ulong whitePawns;
+        public ulong whiteKnights;
+        public ulong whiteBishops;
+        public ulong whiteRooks;
+        public ulong whiteQueens;
+        public ulong whiteKings;
+        public ulong blackPawns;
+        public ulong blackKnights;
+        public ulong blackBishops;
+        public ulong blackRooks;
+        public ulong blackQueens;
+        public ulong blackKings;
+        public ulong occupiedWhite;
+        public ulong occupiedBlack;
+        public ulong occupiedAll;
 
-        public int sideToMove = Colors.White;
-        public int epSquare = 64;
-        public int castlingRights = 15;
-        public int halfMoveClock = 0;
-
+        public int sideToMove;
+        public int epSquare;
+        public int castlingRights;
+        public int halfMoveClock;
         public ulong key;
     }
 }
