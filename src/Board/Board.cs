@@ -44,6 +44,11 @@ namespace Biasfish.Core
             };
         }
 
+        private void IncrementTurn()
+        {
+            sideToMove ^= 1 << 3;
+        }
+
         public void LoadFEN(string fenString)
         {
             // clear bitboards
@@ -94,6 +99,8 @@ namespace Biasfish.Core
 
         public void Push(Move move)
         {
+            IncrementTurn();
+
             switch (move.Flags)
             {
                 case 0:

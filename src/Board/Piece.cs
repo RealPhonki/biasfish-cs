@@ -3,6 +3,16 @@ namespace Biasfish.Core
     public static class Piece
     {
         public static readonly int[] PieceTypes = {1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14};
+        
+        // all enums can be obtained with Piece | Color
+        public const int Pawns = 1;
+        public const int Knights = 2;
+        public const int Bishops = 3;
+        public const int Rooks = 4;
+        public const int Queens = 5;
+        public const int Kings = 6;
+
+        // explicit enums
         public const int WhitePawns = 1;
         public const int WhiteKnights = 2;
         public const int WhiteBishops = 3;
