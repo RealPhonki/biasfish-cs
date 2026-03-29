@@ -1,7 +1,15 @@
 namespace Biasfish.Core
 {
+    /// <summary>
+    /// Represents a board state and metadata with 120 bytes.
+    /// * Note: This struct should be passed into methods using the `ref` keyword.
+    /// </summary>
     public struct Board
     {
+        // The board state is represented by 12 unsigned 64-bit integers where
+        // each active bit represents whether or not a piece is located there.
+        // This allows for fast mutations through bitwise operations.
+        // * ref: https://www.chessprogramming.org/Bitboards
         public ulong whitePawns;
         public ulong whiteKnights;
         public ulong whiteBishops;
@@ -18,12 +26,30 @@ namespace Biasfish.Core
         public ulong occupiedBlack;
         public ulong occupiedAll;
 
+        // Pieces are represented with 4-bits where the first three bits represent the
+        // piece type and the fourth bit represents the color. Because of this, sideToMove
+        // is represented as either 0 (0000) or 8 (1000).
         public int sideToMove;
+
+        // TODO: epSquare will used to add en-passant during legal move generation.
         public int epSquare;
+
+        // TODO: castlingRights will be used to add castling during legal move generation.
         public int castlingRights;
+
+        // TODO: halfMoveClock will be used to track the 50 move rule.
         public int halfMoveClock;
+
+        // TODO: key will be used for zobrist hashing
+        // ? This variable might need to be named `zobristKey`
         public ulong key;
 
+        /// <summary>
+        /// This method returns piece enumerations given a character from a fen string.
+        /// </summary>
+        /// <param name="symbol">Represents the piece type with a fen character.</param>
+        /// <returns>Represents the piece type using the enumerations in `Piece.cs`.</returns>
+        /// <exception cref="ArgumentException">Thrown when an invalid fen character is passed.</exception>
         private static int SymbolToPieceType(char symbol)
         {
             return symbol switch
@@ -44,14 +70,24 @@ namespace Biasfish.Core
             };
         }
 
+        /// <summary>
+        /// This method changes the sideToMove for the board struct by flipping the
+        /// fourth bit.
+        /// </summary>
         private void IncrementTurn()
         {
             sideToMove ^= 1 << 3;
         }
 
+        /// <summary>
+        /// This method reassigns all bitboards and metadata based on the contents of the
+        /// given fen string.
+        /// ref: https://www.chessprogramming.org/Forsyth-Edwards_Notation
+        /// </summary>
+        /// <param name="fenString">Represents the board state and metadata with fen notation.</param>
         public void LoadFEN(string fenString)
         {
-            // clear bitboards
+            // clear all bitboards
             occupiedWhite = 0;
             occupiedBlack = 0;
             occupiedAll = 0;
@@ -70,24 +106,27 @@ namespace Biasfish.Core
             int file = 0;
             foreach (char symbol in fenBoard) 
             {
+                // skip to the next rank (row)
                 if (symbol == '/')
                 {
-                    // skip to the next rank (row)
                     rank--;
                     file = 0;
                 }
+
+                // convert the symbol into an integer and move rightwards by that amount
                 else if (char.IsDigit(symbol))
                 {
-                    // convert the symbol into an integer and move rightwards by that amount
                     file += symbol - '0';
                 }
+
+                // convert the symbol into a piece type
                 else
                 {
-                    // convert the symbol into a piece type
                     int pieceType = SymbolToPieceType(symbol);
                     int pieceColor = Piece.GetColor(pieceType);
                     int square = rank * 8 + file;
 
+                    // assign the piece bitboard and occupancy bitboards
                     SetBitboard(pieceType, GetBitboard(pieceType) | (1UL << square));
                     SetBitboard(pieceColor, GetBitboard(pieceColor) | (1UL << square));
                     occupiedAll |= 1UL << square;
@@ -97,6 +136,10 @@ namespace Biasfish.Core
             }
         }
 
+        /// <summary>
+        /// Plays a given move.
+        /// </summary>
+        /// <param name="move">Represents the move</param>
         public void Push(Move move)
         {
             IncrementTurn();
@@ -104,21 +147,36 @@ namespace Biasfish.Core
             switch (move.Flags)
             {
                 case 0:
+                    // get piece metadata
                     int pieceType = PieceAt(move.FromSquare);
                     int pieceColor = Piece.GetColor(pieceType);
+
+                    // assign the piece bitboard and occupancy bitboards
                     SetBitboard(pieceType, GetBitboard(pieceType) ^ (1UL << move.FromSquare | 1UL << move.ToSquare));
                     SetBitboard(pieceColor, GetBitboard(pieceColor) ^ (1UL << move.FromSquare | 1UL << move.ToSquare));
                     occupiedAll ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+
                     return;
+                // TODO: Implement other flag cases
             }
         }
 
+        /// <summary>
+        /// Returns the integer representing the piece type at a given bit index. 
+        /// Returns 0 if no piece is found.
+        /// </summary>
+        /// <param name="square">Represents the square to index with values from 0-63</param>
+        /// <returns>Represents the piece type using the enumerations in `Piece.cs`</returns>
+        /// <exception cref="InvalidOperationException">Thrown when there is a mismatch between the occupancy bitboard and piece bitboard.</exception>
         public int PieceAt(int square)
         {
+            // if the occupancy bitboard has 0 at the index then return none
             if ((occupiedAll & (1UL << square)) == 0)
             {
                 return Piece.None;
             }
+
+            // check each bitboard for the piece
             foreach (int pieceType in Piece.PieceTypes)
             {
                 if ((GetBitboard(pieceType) & (1UL << square)) != 0)
@@ -126,9 +184,16 @@ namespace Biasfish.Core
                     return pieceType;
                 }
             }
+
+            // there is a mismatch between the occupancy bitboard and the piece bitboards
             throw new InvalidOperationException($"Invalid PieceAt({square}): Occupancy bitboards are not synced.");
         }
 
+        /// <summary>
+        /// Returns a piece bitboard given an integer representing piece type.
+        /// </summary>
+        /// <param name="pieceType">Represents the piece type using the enumerations in `Piece.cs`.</param>
+        /// <returns>Returns the piece bitboard for the given piece type.</returns>
         public ulong GetBitboard(int pieceType)
         {
             switch (pieceType)
@@ -151,6 +216,11 @@ namespace Biasfish.Core
             }
         }
 
+        /// <summary>
+        /// Assigns a given value to a piece bitboard given an integer representing the piece type.
+        /// </summary>
+        /// <param name="pieceType">Represents the piece type using the enumerations in `Piece.cs`.</param>
+        /// <param name="value">Represents the new value for the bitboard.</param>
         public void SetBitboard(int pieceType, ulong value)
         {
             switch (pieceType)
