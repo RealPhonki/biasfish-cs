@@ -24,8 +24,14 @@ namespace Biasfish
             foreach (Move move in moveStack)
             {
                 testBoard.Push(move);
-                Debug.PrintBoard(testBoard);
             }
+
+            Debug.PrintBoard(testBoard);
+
+            Span<Move> memoryBuffer = stackalloc Move[256];
+            MoveList moveList = new MoveList(memoryBuffer);
+            Knights.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine(moveList.Count);
         }
     }
 }
