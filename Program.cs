@@ -8,12 +8,12 @@ namespace Biasfish
     {
         public static void Main(string[] args)
         {
-            Debug.PrintBB(Kings.KingAttacks[0]);
-            Debug.PrintBB(Kings.KingAttacks[4]);
-            Debug.PrintBB(Kings.KingAttacks[24]);
-            Debug.PrintBB(Kings.KingAttacks[27]);
-            Debug.PrintBB(Kings.KingAttacks[31]);
-            Debug.PrintBB(Kings.KingAttacks[60]);
+            Debug.PrintBB(Knights.KnightAttacks[0]);
+            Debug.PrintBB(Knights.KnightAttacks[4]);
+            Debug.PrintBB(Knights.KnightAttacks[24]);
+            Debug.PrintBB(Knights.KnightAttacks[27]);
+            Debug.PrintBB(Knights.KnightAttacks[31]);
+            Debug.PrintBB(Knights.KnightAttacks[60]);
             /*
             Board testBoard = new Board();
             testBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");

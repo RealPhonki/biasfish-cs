@@ -13,15 +13,14 @@ namespace Biasfish.Core
                 ulong king = 1UL << square;
                 ulong attacks = 0;
 
-                attacks |= king << Offset.Rank;                    // UP, bitshift leftwards will not wrap
-                attacks |= king >> Offset.Rank;                    // DOWN, bitshift rightwards will not wrap
-                attacks |= (king << Offset.File) & Masks.NotFileA; // RIGHT, the king should never reach the left-most file by moving rightwards
-                attacks |= (king >> Offset.File) & Masks.NotFileH; // LEFT, the king should never reach the right-most file by moving leftwards
-
-                attacks |= (king << (Offset.Rank + Offset.File)) & Masks.NotFileA; // UP-RIGHT, same mask as RIGHT
-                attacks |= (king << (Offset.Rank - Offset.File)) & Masks.NotFileH; // UP-LEFT, same mask as LEFT
-                attacks |= (king >> (Offset.Rank - Offset.File)) & Masks.NotFileA; // DOWN-RIGHT, same mask as RIGHT
-                attacks |= (king >> (Offset.Rank + Offset.File)) & Masks.NotFileH; // DOWN-LEFT, same mask as LEFT
+                attacks |= king << Offset.Rank;                                    // Up 1
+                attacks |= king >> Offset.Rank;                                    // Down 1
+                attacks |= (king << Offset.File) & Masks.NotFileA;                 // Right 1
+                attacks |= (king >> Offset.File) & Masks.NotFileH;                 // Left 1
+                attacks |= (king << (Offset.Rank + Offset.File)) & Masks.NotFileA; // Up 1, Right 1
+                attacks |= (king << (Offset.Rank - Offset.File)) & Masks.NotFileH; // Up 1, Left 1
+                attacks |= (king >> (Offset.Rank - Offset.File)) & Masks.NotFileA; // Down 1, Right 1
+                attacks |= (king >> (Offset.Rank + Offset.File)) & Masks.NotFileH; // Down 1, Left 1
 
                 KingAttacks[square] = attacks;
             }
