@@ -1,5 +1,7 @@
 
 
+using System.Numerics;
+
 namespace Biasfish.Core
 {
     public static class Kings
@@ -28,7 +30,19 @@ namespace Biasfish.Core
 
         public static MoveList GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
+            ulong friendly = board.GetBitboard(board.sideToMove);
+            ulong kings = board.GetBitboard(Piece.Kings | board.sideToMove);
+
+            int fromSquare = BitOperations.TrailingZeroCount(kings);
+            ulong kingAttacks = KingAttacks[fromSquare] & ~friendly;
             
+            while (kingAttacks != 0)
+            {
+                int toSquare = BitOperations.TrailingZeroCount(kingAttacks);
+                moveList.Add(new Move(fromSquare, toSquare, 0));
+
+                kingAttacks &= kingAttacks - 1;
+            }
 
             return moveList;
         }
