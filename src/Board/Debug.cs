@@ -2,7 +2,8 @@ namespace Biasfish.Core
 {
     public class Debug
     {
-        public static readonly char[] PieceSymbols = {
+        public static readonly char[] PieceSymbols =
+        {
             ' ', '♟', '♞', '♝', '♜', '♛', '♚', ' ', ' ', '♙', '♘', '♗', '♖', '♕', '♔'
         };
 

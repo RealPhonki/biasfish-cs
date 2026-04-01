@@ -8,6 +8,13 @@ namespace Biasfish
     {
         public static void Main(string[] args)
         {
+            Debug.PrintBB(Kings.KingAttacks[0]);
+            Debug.PrintBB(Kings.KingAttacks[4]);
+            Debug.PrintBB(Kings.KingAttacks[24]);
+            Debug.PrintBB(Kings.KingAttacks[27]);
+            Debug.PrintBB(Kings.KingAttacks[31]);
+            Debug.PrintBB(Kings.KingAttacks[60]);
+            /*
             Board testBoard = new Board();
             testBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
             Debug.PrintBoard(testBoard);
@@ -32,6 +39,7 @@ namespace Biasfish
             MoveList moveList = new MoveList(memoryBuffer);
             Knights.GetPseudoLegal(ref testBoard, ref moveList);
             Console.WriteLine(moveList.Length);
+            */
         }
     }
 }
