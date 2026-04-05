@@ -1,0 +1,17 @@
+# TODO - Features
+- Add Flags to Constants.cs
+- Add Flag handling in Board.cs/Board.PushMove
+- Add King captures
+- Add Knight captures
+- Add Pawn moves, promotions, and captures
+- Add Rook moves and captures
+- Add Bishop moves and captures
+- Add Queen moves and captures
+- Add castling
+- Add en-passant
+- Add check detection
+
+# TODO - Optimiztions
+- Correct PieceAt implementation. Use Mailbox approach
+- Eliminate the GetBitboard and SetBitboard switches
+- Correct get and set in MoveList
