@@ -26,7 +26,7 @@ namespace Biasfish.Core
             }
         }
 
-        public static MoveList GetPseudoLegal(ref Board board, ref MoveList moveList)
+        public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
             ulong friendly = board.GetBitboard(board.sideToMove);
             ulong knights = board.GetBitboard(Piece.Knights | board.sideToMove);
@@ -45,8 +45,6 @@ namespace Biasfish.Core
                 }
                 knights &= knights - 1; // this clears the lsb
             }
-
-            return moveList;
         }
     }
 }

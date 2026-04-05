@@ -37,6 +37,7 @@ namespace Biasfish.Core
 
         // Helper enumerations
         public const int None = 0;
+        public const int Any = 15;
         public const int White = 0;
         public const int Black = 8;
 
@@ -47,7 +48,12 @@ namespace Biasfish.Core
         /// <returns>Represents the piece color using the enumerations above.</returns>
         public static int GetColor(int pieceType)
         {
-            return pieceType >> 3 == 0 ? White : Black;
+            return pieceType & 8;
+        }
+
+        public static int FlipColor(int pieceType)
+        {
+            return pieceType ^ (1 << 3);
         }
     }
 
@@ -108,9 +114,7 @@ namespace Biasfish.Core
             NotFileA, NotFileB, NotFileC, NotFileD, NotFileE, NotFileF, NotFileG, NotFileH
         };
     }
-
-    namespace Biasfish.Core
-{
+    
     public static class Squares
     {
         public const int A1 = 0;
@@ -178,5 +182,4 @@ namespace Biasfish.Core
         public const int G8 = 62;
         public const int H8 = 63;
     }
-}
 }

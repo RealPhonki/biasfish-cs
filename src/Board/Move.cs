@@ -25,5 +25,10 @@ namespace Biasfish.Core
         {
             value = (ushort)(fromSquare | (toSquare << 6) | (flags << 12));
         }
+
+        public override string ToString()
+        {
+            return $"Move({Debug.SquareNames[FromSquare]}, {Debug.SquareNames[ToSquare]}, {Flags})";
+        }
     }
 }

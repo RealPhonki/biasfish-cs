@@ -38,6 +38,11 @@ namespace Biasfish
             Console.WriteLine($"+Knight moves, moveList.Length: {moveList.Length}");
             Kings.GetPseudoLegal(ref testBoard, ref moveList);
             Console.WriteLine($"+King moves,   moveList.Length: {moveList.Length}");
+
+            for (int i=0; i<moveList.Length; i++)
+            {
+                Console.WriteLine(moveList.Get(i));
+            }
         }
     }
 }

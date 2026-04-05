@@ -1,5 +1,3 @@
-
-
 using System.Numerics;
 
 namespace Biasfish.Core
@@ -28,7 +26,7 @@ namespace Biasfish.Core
             }
         }
 
-        public static MoveList GetPseudoLegal(ref Board board, ref MoveList moveList)
+        public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
             ulong friendly = board.GetBitboard(board.sideToMove);
             ulong kings = board.GetBitboard(Piece.Kings | board.sideToMove);
@@ -43,8 +41,6 @@ namespace Biasfish.Core
 
                 kingAttacks &= kingAttacks - 1;
             }
-
-            return moveList;
         }
     }
 }

@@ -198,6 +198,7 @@ namespace Biasfish.Core
         {
             switch (pieceType)
             {
+                case Piece.Any:          return occupiedAll;
                 case Piece.White:        return occupiedWhite;
                 case Piece.WhitePawns:   return whitePawns;
                 case Piece.WhiteKnights: return whiteKnights;
@@ -225,6 +226,7 @@ namespace Biasfish.Core
         {
             switch (pieceType)
             {
+                case Piece.Any:          occupiedAll   = value; return;
                 case Piece.White:        occupiedWhite = value; return;
                 case Piece.WhitePawns:   whitePawns    = value; return;
                 case Piece.WhiteKnights: whiteKnights  = value; return;
