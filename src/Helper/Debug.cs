@@ -32,7 +32,7 @@ namespace Biasfish.Core
                     bool pieceFound = false;
                     foreach (int pieceType in Piece.PieceTypes)
                     {
-                        ulong bitboard = board.GetBitboard(pieceType);
+                        ulong bitboard = board.Get(pieceType);
 
                         if ((bitboard & (1UL << square)) != 0)
                         {

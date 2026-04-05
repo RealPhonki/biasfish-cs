@@ -28,8 +28,8 @@ namespace Biasfish.Core
 
         public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
-            ulong friendly = board.GetBitboard(board.sideToMove);
-            ulong kings = board.GetBitboard(Piece.Kings | board.sideToMove);
+            ulong friendly = board.Get(board.sideToMove);
+            ulong kings = board.Get(Piece.Kings | board.sideToMove);
 
             int fromSquare = BitOperations.TrailingZeroCount(kings);
             ulong kingAttacks = KingAttacks[fromSquare] & ~friendly;

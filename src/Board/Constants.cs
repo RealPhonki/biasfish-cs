@@ -46,15 +46,8 @@ namespace Biasfish.Core
         /// </summary>
         /// <param name="pieceType">Represents the piece type using the enumerations above.</param>
         /// <returns>Represents the piece color using the enumerations above.</returns>
-        public static int GetColor(int pieceType)
-        {
-            return pieceType & 8;
-        }
-
-        public static int FlipColor(int pieceType)
-        {
-            return pieceType ^ (1 << 3);
-        }
+        public static int GetColor(int pieceType) => pieceType & 8;
+        public static int FlipColor(int pieceType) => pieceType ^ 8;
     }
 
     public static class Offset
