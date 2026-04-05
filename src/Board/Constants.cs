@@ -3,9 +3,20 @@ namespace Biasfish.Core
     public static class Piece
     {
         // Contains an array of the enumerations for pieces only
-        public static readonly int[] PieceTypes = 
+        public static readonly byte[] PieceTypes = 
         {
-            1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14
+            WhitePawns,
+            WhiteKnights,
+            WhiteBishops,
+            WhiteRooks,
+            WhiteQueens,
+            WhiteKings,
+            BlackPawns,
+            BlackKnights,
+            BlackBishops,
+            BlackRooks,
+            BlackQueens,
+            BlackKings,
         };
         
         // Represents pieces with 3-bit values. These can be ORed with color enumerations, for example:

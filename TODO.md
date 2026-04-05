@@ -12,5 +12,4 @@
 - Add check detection
 
 # TODO - Optimiztions
-- Correct PieceAt implementation. Use Mailbox approach
 - Correct get and set in MoveList

@@ -1,7 +1,7 @@
 namespace Biasfish.Core
 {
     /// <summary>
-    /// Represents a board state and metadata with 120 bytes.
+    /// Represents a board state and metadata.
     /// * Note: This struct should be passed into methods using the `ref` keyword.
     /// </summary>
     public struct Board
@@ -11,6 +11,8 @@ namespace Biasfish.Core
         // This allows for fast mutations through bitwise operations.
         // * ref: https://www.chessprogramming.org/Bitboards
         public unsafe fixed ulong Bitboards[16];
+
+        public unsafe fixed byte MailBox[64];
 
         // Pieces are represented with 4-bits where the first three bits represent the
         // piece type and the fourth bit represents the color. Because of this, sideToMove
@@ -115,6 +117,8 @@ namespace Biasfish.Core
                         Bitboards[pieceType] |= 1UL << square;
                         Bitboards[pieceColor] |= 1UL << square;
                         Bitboards[Piece.Any] |= 1UL << square;
+
+                        MailBox[square] = (byte)pieceType;
                         
                         file++;
                     }
@@ -143,6 +147,9 @@ namespace Biasfish.Core
                         Bitboards[pieceType] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
                         Bitboards[pieceColor] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
                         Bitboards[Piece.Any] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+
+                        MailBox[move.FromSquare] = Piece.None;
+                        MailBox[move.ToSquare] = (byte)pieceType;
                     }
                     
                     return;
@@ -156,26 +163,12 @@ namespace Biasfish.Core
         /// </summary>
         /// <param name="square">Represents the square to index with values from 0-63</param>
         /// <returns>Represents the piece type using the enumerations in `Piece.cs`</returns>
-        /// <exception cref="InvalidOperationException">Thrown when there is a mismatch between the occupancy bitboard and piece bitboard.</exception>
         public int PieceAt(int square)
         {
-            // if the occupancy bitboard has 0 at the index then return none
-            if ((Get(Piece.Any) & (1UL << square)) == 0)
+            unsafe
             {
-                return Piece.None;
+                return MailBox[square];
             }
-
-            // check each bitboard for the piece
-            foreach (int pieceType in Piece.PieceTypes)
-            {
-                if ((Get(pieceType) & (1UL << square)) != 0)
-                {
-                    return pieceType;
-                }
-            }
-
-            // there is a mismatch between the occupancy bitboard and the piece bitboards
-            throw new InvalidOperationException($"Invalid PieceAt({square}): Occupancy bitboards are not synced.");
         }
 
         public ulong Get(int pieceType)
