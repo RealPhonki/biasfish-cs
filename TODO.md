@@ -13,5 +13,4 @@
 
 # TODO - Optimiztions
 - Correct PieceAt implementation. Use Mailbox approach
-- Eliminate the GetBitboard and SetBitboard switches
 - Correct get and set in MoveList
