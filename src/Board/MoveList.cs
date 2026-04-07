@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Biasfish.Core
 {
     /// <summary>
@@ -21,20 +23,20 @@ namespace Biasfish.Core
         /// Inserts a move element at the next empty index and increments the length.
         /// </summary>
         /// <param name="move">Represents the move to append.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(Move move)
         {
-            moves[Length] = move;
-            Length++;
+            // Length++ is evaluated after indexing.
+            // If written as `++Length` it would be evaluated before (causing errors)
+            moves[Length++] = move;
         }
 
-        /// <summary>
-        /// Returns the move element at the specified index.
-        /// </summary>
-        /// <param name="index">The index of the move to retrieve.</param>
-        /// <returns>Represents the move at the specified index.</returns>
-        public Move Get(int index)
+        public Move this[int index]
         {
-            return moves[index];
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => moves[index];
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => moves[index] = value;
         }
     }
 }

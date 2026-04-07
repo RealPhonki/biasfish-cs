@@ -41,7 +41,7 @@ namespace Biasfish
 
             for (int i=0; i<moveList.Length; i++)
             {
-                Console.WriteLine(moveList.Get(i));
+                Console.WriteLine(moveList[i]);
             }
         }
     }

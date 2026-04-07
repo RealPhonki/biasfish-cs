@@ -59,15 +59,6 @@ namespace Biasfish.Core
         }
 
         /// <summary>
-        /// This method changes the sideToMove for the board struct by flipping the
-        /// fourth bit.
-        /// </summary>
-        private void IncrementTurn()
-        {
-            sideToMove ^= 1 << 3;
-        }
-
-        /// <summary>
         /// This method reassigns all bitboards and metadata based on the contents of the
         /// given fen string.
         /// ref: https://www.chessprogramming.org/Forsyth-Edwards_Notation
@@ -132,7 +123,7 @@ namespace Biasfish.Core
         /// <param name="move">Represents the move</param>
         public void Push(Move move)
         {
-            IncrementTurn();
+            sideToMove = Piece.FlipColor(sideToMove);
 
             switch (move.Flags)
             {
