@@ -13,14 +13,26 @@ namespace Biasfish.Core
                 ulong knight = 1UL << square;
                 ulong attacks = 0;
 
-                attacks |= (knight << (2 * Offset.Rank +     Offset.File)) & Masks.NotFileA;                  // Up 2, Right 1
-                attacks |= (knight << (2 * Offset.Rank -     Offset.File)) & Masks.NotFileH;                  // Up 2, Left 1
-                attacks |= (knight << (    Offset.Rank + 2 * Offset.File)) & Masks.NotFileA & Masks.NotFileB; // Up 1, Right 2
-                attacks |= (knight << (    Offset.Rank - 2 * Offset.File)) & Masks.NotFileG & Masks.NotFileH; // Up 1, Left 2
-                attacks |= (knight >> (    Offset.Rank - 2 * Offset.File)) & Masks.NotFileA & Masks.NotFileB; // Down 1, Right 2
-                attacks |= (knight >> (    Offset.Rank + 2 * Offset.File)) & Masks.NotFileG & Masks.NotFileH; // Down 1, Left 2
-                attacks |= (knight >> (2 * Offset.Rank -     Offset.File)) & Masks.NotFileA;                  // Down 2, Right 1
-                attacks |= (knight >> (2 * Offset.Rank +     Offset.File)) & Masks.NotFileH;                  // Down 2, Left 1
+                // Knight attack mappings: https://www.chessprogramming.org/Knight_Pattern
+                //         NoWe      NoEa
+                //           +15  +17
+                //            |     |
+                // WeWe  +6 __|     |__+10  EaEa
+                //             \   /
+                //              >0<
+                //          __ /   \ __
+                // WeWe -10   |     |   -6  EaEa
+                //            |     |
+                //           -17  -15
+                //         SoWe      SoEa
+                attacks |= (knight << 17) & Masks.NotFileA;  // NoEa
+                attacks |= (knight << 15) & Masks.NotFileH;  // NoWe
+                attacks |= (knight << 10) & Masks.NotFileAB; // EaEa
+                attacks |= (knight <<  6) & Masks.NotFileGH; // WeWe
+                attacks |= (knight >>  6) & Masks.NotFileAB; // EaEa
+                attacks |= (knight >> 10) & Masks.NotFileGH; // WeWe
+                attacks |= (knight >> 15) & Masks.NotFileA;  // SoEa
+                attacks |= (knight >> 17) & Masks.NotFileH;  // SoWe
 
                 KnightAttacks[square] = attacks;
             }

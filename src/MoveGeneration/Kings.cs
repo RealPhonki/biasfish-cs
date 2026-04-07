@@ -13,14 +13,18 @@ namespace Biasfish.Core
                 ulong king = 1UL << square;
                 ulong attacks = 0;
 
-                attacks |= king << Offset.Rank;                                    // Up 1
-                attacks |= king >> Offset.Rank;                                    // Down 1
-                attacks |= (king << Offset.File) & Masks.NotFileA;                 // Right 1
-                attacks |= (king >> Offset.File) & Masks.NotFileH;                 // Left 1
-                attacks |= (king << (Offset.Rank + Offset.File)) & Masks.NotFileA; // Up 1, Right 1
-                attacks |= (king << (Offset.Rank - Offset.File)) & Masks.NotFileH; // Up 1, Left 1
-                attacks |= (king >> (Offset.Rank - Offset.File)) & Masks.NotFileA; // Down 1, Right 1
-                attacks |= (king >> (Offset.Rank + Offset.File)) & Masks.NotFileH; // Down 1, Left 1
+                // King attack mappings
+                // +7 +8 +9
+                // -1  0 +1
+                // -9 -8 -7
+                attacks |= (king << 9) & Masks.NotFileA; // NoEa
+                attacks |= king << 8;                    // No
+                attacks |= (king << 7) & Masks.NotFileH; // NoWe
+                attacks |= (king << 1) & Masks.NotFileA; // Ea
+                attacks |= (king >> 1) & Masks.NotFileH; // We
+                attacks |= (king >> 7) & Masks.NotFileA; // SoEa
+                attacks |= king >> 8;                    // So
+                attacks |= (king >> 9) & Masks.NotFileH; // SoWe
 
                 KingAttacks[square] = attacks;
             }
