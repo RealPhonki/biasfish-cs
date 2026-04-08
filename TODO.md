@@ -1,5 +1,4 @@
 # TODO - Features
-- Add Flags to Constants.cs
 - Add Flag handling in Board.cs/Board.PushMove
 - Add King captures
 - Add Knight captures
@@ -10,6 +9,3 @@
 - Add castling
 - Add en-passant
 - Add check detection
-
-# TODO - Optimiztions
-- Correct get and set in MoveList
