@@ -84,6 +84,8 @@ namespace Biasfish.Core
         public const int BishopPromoteCapture = 13;
         public const int RookPromoteCapture = 14;
         public const int QueenPromoteCapture = 15;
+
+        public static bool IsCapture(int flag) => (flag & Capture) != 0;
     }
 
     public static class Masks

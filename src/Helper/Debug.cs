@@ -7,6 +7,26 @@ namespace Biasfish.Core
             ' ', '♟', '♞', '♝', '♜', '♛', '♚', ' ', ' ', '♙', '♘', '♗', '♖', '♕', '♔'
         };
 
+        public static readonly string[] FlagNames =
+        {
+            "Quiet",
+            "Double Pawn Push",
+            "O-O",
+            "O-O-O",
+            "Capture",
+            "EpCapture",
+            "Invalid",
+            "Invalid",
+            "KnightPromote",
+            "BishopPromote",
+            "RookPromote",
+            "QueenPromote",
+            "KnightPromoteCapture",
+            "BishopPromoteCapture",
+            "RookPromoteCapture",
+            "QueenPromoteCapture"
+        };
+
         public static readonly string[] SquareNames =
         {
             "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1", 

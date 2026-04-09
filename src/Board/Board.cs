@@ -123,27 +123,44 @@ namespace Biasfish.Core
         /// <param name="move">Represents the move</param>
         public void Push(Move move)
         {
-            sideToMove = Piece.FlipColor(sideToMove);
-
-            switch (move.Flags)
+            unsafe
             {
-                case 0:
+                sideToMove = Piece.FlipColor(sideToMove);
+
+                if (Flag.IsCapture(move.Flags))
+                {
+                    // get piece metadata
+                    int pieceType = PieceAt(move.FromSquare);
+                    int enemyPieceType = PieceAt(move.ToSquare);
+                    int pieceColor = Piece.GetColor(pieceType);
+
+                    // assign the piece bitboard and occupancy bitboards
+                    Bitboards[enemyPieceType] &= 1UL << move.ToSquare; // clear enemy piece
+                    Bitboards[pieceType] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+                    Bitboards[pieceColor] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+                    Bitboards[Piece.Any] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+
+                    MailBox[move.FromSquare] = Piece.None;
+                    MailBox[move.ToSquare] = (byte)pieceType;
+                    
+                    return;
+                }
+                else
+                {
                     // get piece metadata
                     int pieceType = PieceAt(move.FromSquare);
                     int pieceColor = Piece.GetColor(pieceType);
 
                     // assign the piece bitboard and occupancy bitboards
-                    unsafe
-                    {
-                        Bitboards[pieceType] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-                        Bitboards[pieceColor] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-                        Bitboards[Piece.Any] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+                    Bitboards[pieceType] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+                    Bitboards[pieceColor] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
+                    Bitboards[Piece.Any] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
 
-                        MailBox[move.FromSquare] = Piece.None;
-                        MailBox[move.ToSquare] = (byte)pieceType;
-                    }
+                    MailBox[move.FromSquare] = Piece.None;
+                    MailBox[move.ToSquare] = (byte)pieceType;
                     
                     return;
+                }
                 // TODO: Implement other flag cases
             }
         }

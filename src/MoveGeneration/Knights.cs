@@ -40,22 +40,33 @@ namespace Biasfish.Core
 
         public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
-            ulong friendly = board.Get(board.sideToMove);
             ulong knights = board.Get(Piece.Knights | board.sideToMove);
 
             while (knights != 0)
             {
                 int fromSquare = BitOperations.TrailingZeroCount(knights);
-                ulong knightAttacks = KnightAttacks[fromSquare] & ~friendly; // mask friendly pieces
+                ulong knightAttacks = KnightAttacks[fromSquare];
 
-                while (knightAttacks != 0)
+                ulong quietMoves = knightAttacks & ~board.Get(Piece.Any);
+                ulong captureMoves = knightAttacks & board.Get(Piece.FlipColor(board.sideToMove));
+
+                while (quietMoves != 0)
                 {
-                    int toSquare = BitOperations.TrailingZeroCount(knightAttacks);
-                    moveList.Add(new Move(fromSquare, toSquare, 0));
+                    int toSquare = BitOperations.TrailingZeroCount(quietMoves);
+                    moveList.Add(new Move(fromSquare, toSquare, Flag.Quiet));
 
-                    knightAttacks &= knightAttacks - 1; // this clears the lsb
+                    quietMoves &= quietMoves - 1; // clear lsb
                 }
-                knights &= knights - 1; // this clears the lsb
+
+                while (captureMoves != 0)
+                {
+                    int toSquare = BitOperations.TrailingZeroCount(captureMoves);
+                    moveList.Add(new Move(fromSquare, toSquare, Flag.Capture));
+
+                    captureMoves &= captureMoves - 1; // clear lsb
+                }
+
+                knights &= knights - 1;
             }
         }
     }

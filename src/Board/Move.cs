@@ -28,7 +28,7 @@ namespace Biasfish.Core
 
         public override string ToString()
         {
-            return $"Move({Debug.SquareNames[FromSquare]}, {Debug.SquareNames[ToSquare]}, {Flags})";
+            return $"Move({Debug.SquareNames[FromSquare]}, {Debug.SquareNames[ToSquare]}, {Debug.FlagNames[Flags]})";
         }
     }
 }

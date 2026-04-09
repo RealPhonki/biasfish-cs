@@ -9,3 +9,5 @@
 - Add castling
 - Add en-passant
 - Add check detection
+- Get attack bitboard
+- Don't generate king moves onto attacked squares
