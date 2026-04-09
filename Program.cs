@@ -10,7 +10,7 @@ namespace Biasfish
         {
             // initialize board
             Board testBoard = new Board();
-            testBoard.LoadFEN("8/5k2/5p2/5Kp1/r3P3/2N5/8/8 w - - 0 1");
+            testBoard.LoadFEN("6rk/p5rr/1R6/8/8/8/2p3RR/1N1R2RK b - - 0 1");
 
             Debug.PrintBoard(testBoard);
 
@@ -23,10 +23,12 @@ namespace Biasfish
             Console.WriteLine($"+Knight moves, moveList.Length: {moveList.Length}");
             Kings.GetPseudoLegal(ref testBoard, ref moveList);
             Console.WriteLine($"+King moves,   moveList.Length: {moveList.Length}");
+            Pawns.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine($"+Pawn moves,   moveList.Length: {moveList.Length}");
 
             for (int i=0; i<moveList.Length; i++)
             {
-                Console.WriteLine(moveList[i]);
+                Console.WriteLine($"{i}: {moveList[i]}");
             }
         }
     }

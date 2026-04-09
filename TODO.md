@@ -1,8 +1,5 @@
 # TODO - Features
 - Add Flag handling in Board.cs/Board.PushMove
-- Add King captures
-- Add Knight captures
-- Add Pawn moves, promotions, and captures
 - Add Rook moves and captures
 - Add Bishop moves and captures
 - Add Queen moves and captures

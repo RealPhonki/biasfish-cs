@@ -42,13 +42,16 @@ namespace Biasfish.Core
         {
             ulong knights = board.Get(Piece.Knights | board.sideToMove);
 
+            ulong empty = ~board.Get(Piece.Any);
+            ulong enemy = board.Get(Piece.FlipColor(board.sideToMove));
+
             while (knights != 0)
             {
                 int fromSquare = BitOperations.TrailingZeroCount(knights);
                 ulong knightAttacks = KnightAttacks[fromSquare];
 
-                ulong quietMoves = knightAttacks & ~board.Get(Piece.Any);
-                ulong captureMoves = knightAttacks & board.Get(Piece.FlipColor(board.sideToMove));
+                ulong quietMoves = knightAttacks & empty;
+                ulong captureMoves = knightAttacks & enemy;
 
                 while (quietMoves != 0)
                 {

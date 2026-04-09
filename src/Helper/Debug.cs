@@ -14,17 +14,17 @@ namespace Biasfish.Core
             "O-O",
             "O-O-O",
             "Capture",
-            "EpCapture",
+            "En-Passant",
             "Invalid",
             "Invalid",
-            "KnightPromote",
-            "BishopPromote",
-            "RookPromote",
-            "QueenPromote",
-            "KnightPromoteCapture",
-            "BishopPromoteCapture",
-            "RookPromoteCapture",
-            "QueenPromoteCapture"
+            "Knight Promote",
+            "Bishop Promote",
+            "Rook Promote",
+            "Queen Promote",
+            "Knight Promote Capture",
+            "Bishop Promote Capture",
+            "Rook Promote Capture",
+            "Queen Promote Capture"
         };
 
         public static readonly string[] SquareNames =

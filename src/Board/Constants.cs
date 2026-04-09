@@ -91,6 +91,12 @@ namespace Biasfish.Core
     public static class Masks
     {
         public const ulong Rank1 = 0xFF;
+        public const ulong Rank2 = Rank1 << 8;
+        public const ulong Rank3 = Rank1 << 16;
+        public const ulong Rank6 = Rank1 << 40;
+        public const ulong Rank7 = Rank1 << 48;
+        public const ulong NotRank2 = ~Rank2;
+        public const ulong NotRank7 = ~Rank7;
         public const ulong FileA = 0x0101010101010101;
         public const ulong FileB = FileA << 1;
         public const ulong FileG = FileA << 6;
