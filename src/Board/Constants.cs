@@ -93,21 +93,159 @@ namespace Biasfish.Core
         public const ulong Rank1 = 0xFF;
         public const ulong Rank2 = Rank1 << 8;
         public const ulong Rank3 = Rank1 << 16;
+        public const ulong Rank4 = Rank1 << 24;
+        public const ulong Rank5 = Rank1 << 32;
         public const ulong Rank6 = Rank1 << 40;
         public const ulong Rank7 = Rank1 << 48;
+        public const ulong Rank8 = Rank1 << 56;
+        public static readonly ulong[] Rank =
+        {
+            Rank1,
+            Rank2,
+            Rank3,
+            Rank4,
+            Rank5,
+            Rank6,
+            Rank7,
+            Rank8,
+        };
+        public const ulong NotRank1 = ~Rank1;
         public const ulong NotRank2 = ~Rank2;
+        public const ulong NotRank3 = ~Rank3;
+        public const ulong NotRank4 = ~Rank4;
+        public const ulong NotRank5 = ~Rank5;
+        public const ulong NotRank6 = ~Rank6;
         public const ulong NotRank7 = ~Rank7;
+        public const ulong NotRank8 = ~Rank8;
+        public static readonly ulong[] NotRank =
+        {
+            NotRank1,
+            NotRank2,
+            NotRank3,
+            NotRank4,
+            NotRank5,
+            NotRank6,
+            NotRank7,
+            NotRank8,
+        };
+        public const ulong AboveRank1 = Rank8 | Rank7 | Rank6 | Rank5 | Rank4 | Rank3 | Rank2;
+        public const ulong AboveRank2 = Rank8 | Rank7 | Rank6 | Rank5 | Rank4 | Rank3;
+        public const ulong AboveRank3 = Rank8 | Rank7 | Rank6 | Rank5 | Rank4;
+        public const ulong AboveRank4 = Rank8 | Rank7 | Rank6 | Rank5;
+        public const ulong AboveRank5 = Rank8 | Rank7 | Rank6;
+        public const ulong AboveRank6 = Rank8 | Rank7;
+        public const ulong AboveRank7 = Rank8;
+        public const ulong AboveRank8 = 0;
+        public static readonly ulong[] AboveRank =
+        {
+            AboveRank1,
+            AboveRank2,
+            AboveRank3,
+            AboveRank4,
+            AboveRank5,
+            AboveRank6,
+            AboveRank7,
+            AboveRank8,
+        };
+        public const ulong BelowRank8 = Rank1 | Rank2 | Rank3 | Rank4 | Rank5 | Rank6 | Rank7; 
+        public const ulong BelowRank7 = Rank1 | Rank2 | Rank3 | Rank4 | Rank5 | Rank6;
+        public const ulong BelowRank6 = Rank1 | Rank2 | Rank3 | Rank4 | Rank5;
+        public const ulong BelowRank5 = Rank1 | Rank2 | Rank3 | Rank4;
+        public const ulong BelowRank4 = Rank1 | Rank2 | Rank3;
+        public const ulong BelowRank3 = Rank1 | Rank2;
+        public const ulong BelowRank2 = Rank1;
+        public const ulong BelowRank1 = 0;
+        public static readonly ulong[] BelowRank =
+        {
+            BelowRank1,
+            BelowRank2,
+            BelowRank3,
+            BelowRank4,
+            BelowRank5,
+            BelowRank6,
+            BelowRank7,
+            BelowRank8,
+        };
         public const ulong FileA = 0x0101010101010101;
         public const ulong FileB = FileA << 1;
+        public const ulong FileC = FileA << 2;
+        public const ulong FileD = FileA << 3;
+        public const ulong FileE = FileA << 4;
+        public const ulong FileF = FileA << 5;
         public const ulong FileG = FileA << 6;
         public const ulong FileH = FileA << 7;
+        public static readonly ulong[] File =
+        {
+            FileA,
+            FileB,
+            FileC,
+            FileD,
+            FileE,
+            FileF,
+            FileG,
+            FileH
+        };
         public const ulong FileAB = FileA | FileB;
         public const ulong FileGH = FileG | FileH;
         public const ulong NotFileA = ~FileA;
+        public const ulong NotFileB = ~FileB;
+        public const ulong NotFileC = ~FileC;
+        public const ulong NotFileD = ~FileD;
+        public const ulong NotFileE = ~FileE;
+        public const ulong NotFileF = ~FileF;
+        public const ulong NotFileG = ~FileG;
         public const ulong NotFileH = ~FileH;
+        public static readonly ulong[] NotFile =
+        {
+            NotFileA,
+            NotFileB,
+            NotFileC,
+            NotFileD,
+            NotFileE,
+            NotFileF,
+            NotFileG,
+            NotFileH,
+        };
         public const ulong NotFileAB = ~FileAB;
         public const ulong NotFileGH = ~FileGH;
-
+        public const ulong RightFileA = FileH | FileG | FileF | FileE | FileD | FileC | FileB;
+        public const ulong RightFileB = FileH | FileG | FileF | FileE | FileD | FileC;
+        public const ulong RightFileC = FileH | FileG | FileF | FileE | FileD;
+        public const ulong RightFileD = FileH | FileG | FileF | FileE;
+        public const ulong RightFileE = FileH | FileG | FileF;
+        public const ulong RightFileF = FileH | FileG;
+        public const ulong RightFileG = FileH;
+        public const ulong RightFileH = 0;
+        public static readonly ulong[] RightFile =
+        {
+            RightFileA,
+            RightFileB,
+            RightFileC,
+            RightFileD,
+            RightFileE,
+            RightFileF,
+            RightFileG,
+            RightFileH
+        };
+        public const ulong LeftFileH = FileA | FileB | FileC | FileD | FileE | FileF | FileG;
+        public const ulong LeftFileG = FileA | FileB | FileC | FileD | FileE | FileF;
+        public const ulong LeftFileF = FileA | FileB | FileC | FileD | FileE;
+        public const ulong LeftFileE = FileA | FileB | FileC | FileD;
+        public const ulong LeftFileD = FileA | FileB | FileC;
+        public const ulong LeftFileC = FileA | FileB;
+        public const ulong LeftFileB = FileA;
+        public const ulong LeftFileA = 0;
+        public static readonly ulong[] LeftFile =
+        {
+            LeftFileA,
+            LeftFileB,
+            LeftFileC,
+            LeftFileD,
+            LeftFileE,
+            LeftFileF,
+            LeftFileG,
+            LeftFileH
+        };
     }
     
     public static class Squares
