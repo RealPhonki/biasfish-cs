@@ -44,7 +44,6 @@ namespace Biasfish
                 blockers = ray & occupied;
                 if (blockers != 0)
                 {
-                    Debug.PrintBB(ray);
                     ray ^= NorthRay[BitOperations.TrailingZeroCount(blockers)];
                 }
                 rookAttacks |= ray;
