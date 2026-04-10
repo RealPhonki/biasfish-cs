@@ -10,7 +10,7 @@ namespace Biasfish
         {
             // initialize board
             Board testBoard = new Board();
-            testBoard.LoadFEN("6rk/p5rr/1R6/8/8/8/2p3RR/1N1R2RK b - - 0 1");
+            testBoard.LoadFEN("kq6/qq4R1/8/8/8/6P1/QQ6/KQ6 w - - 0 1");
 
             Debug.PrintBoard(testBoard);
 
@@ -18,13 +18,13 @@ namespace Biasfish
             Span<Move> memoryBuffer = stackalloc Move[256];
             MoveList moveList = new MoveList(memoryBuffer);
 
-            Console.WriteLine($"+None,         moveList.Length: {moveList.Length}");
-            Knights.GetPseudoLegal(ref testBoard, ref moveList);
-            Console.WriteLine($"+Knight moves, moveList.Length: {moveList.Length}");
-            Kings.GetPseudoLegal(ref testBoard, ref moveList);
-            Console.WriteLine($"+King moves,   moveList.Length: {moveList.Length}");
-            Pawns.GetPseudoLegal(ref testBoard, ref moveList);
-            Console.WriteLine($"+Pawn moves,   moveList.Length: {moveList.Length}");
+            //Console.WriteLine($"+Knight moves, moveList.Length: {moveList.Length}");
+            //Kings.GetPseudoLegal(ref testBoard, ref moveList);
+            //Console.WriteLine($"+King moves,   moveList.Length: {moveList.Length}");
+            //Pawns.GetPseudoLegal(ref testBoard, ref moveList);
+            //Console.WriteLine($"+Pawn moves,   moveList.Length: {moveList.Length}");
+            Rooks.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine($"+Rook moves,   moveList.Length: {moveList.Length}");
 
             for (int i=0; i<moveList.Length; i++)
             {
