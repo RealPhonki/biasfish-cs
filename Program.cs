@@ -8,7 +8,7 @@ namespace Biasfish
         {
             // initialize board
             Board testBoard = new Board();
-            testBoard.LoadFEN("r1b2rk1/pppp1Npp/2n5/4p3/2Bq3R/5KP1/PPPP4/RNBQ4 b - - 4 11");
+            testBoard.LoadFEN("5b2/5pkp/1Rr3p1/6P1/8/5K2/8/8 w - - 0 1");
 
             Debug.PrintBoard(testBoard);
 

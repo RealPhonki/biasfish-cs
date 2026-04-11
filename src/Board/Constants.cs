@@ -49,7 +49,7 @@ namespace Biasfish.Core
         public const int BlackKings = 14;
 
         // Helper enumerations
-        public const int None = 0;
+        public const int Null = 0;
         public const int Any = 15;
         public const int White = 0;
         public const int Black = 8;
@@ -63,7 +63,7 @@ namespace Biasfish.Core
         public static int FlipColor(int pieceType) => pieceType ^ 8;
     }
 
-    public static class Flag
+    public static class Flags
     {
         /// <summary>
         /// First bit represents promotion
@@ -76,6 +76,7 @@ namespace Biasfish.Core
         public const int QueenCastle = 3;
         public const int Capture = 4;
         public const int EpCapture = 5;
+        public const int Promotion = 8;
         public const int KnightPromote = 8;
         public const int BishopPromote = 9;
         public const int RookPromote = 10;
@@ -85,7 +86,14 @@ namespace Biasfish.Core
         public const int RookPromoteCapture = 14;
         public const int QueenPromoteCapture = 15;
 
-        public static bool IsCapture(int flag) => (flag & Capture) != 0;
+        public static bool IsQuiet(int flags) => flags == Quiet;
+        public static bool IsCaptureOnly(int flags) => flags == Capture;
+        public static bool IsCapture(int flags) => (flags & Capture) != 0;
+        public static bool IsDoublePawnPush(int flags) => flags == DoublePawnPush;
+        public static bool IsKingCastle(int flags) => flags == KingCastle;
+        public static bool IsQueenCastle(int flags) => flags == QueenCastle;
+        public static bool IsEnPassant(int flags) => flags == EpCapture;
+        public static bool IsPromotion(int flags) => (flags & Promotion) != 0;
     }
 
     public static class Masks
@@ -246,10 +254,87 @@ namespace Biasfish.Core
             LeftFileG,
             LeftFileH
         };
+
+        public const ulong A1 = 1UL << 0;
+        public const ulong B1 = 1UL << 1;
+        public const ulong C1 = 1UL << 2;
+        public const ulong D1 = 1UL << 3;
+        public const ulong E1 = 1UL << 4;
+        public const ulong F1 = 1UL << 5;
+        public const ulong G1 = 1UL << 6;
+        public const ulong H1 = 1UL << 7;
+        public const ulong A2 = 1UL << 8;
+        public const ulong B2 = 1UL << 9;
+        public const ulong C2 = 1UL << 10;
+        public const ulong D2 = 1UL << 11;
+        public const ulong E2 = 1UL << 12;
+        public const ulong F2 = 1UL << 13;
+        public const ulong G2 = 1UL << 14;
+        public const ulong H2 = 1UL << 15;
+        public const ulong A3 = 1UL << 16;
+        public const ulong B3 = 1UL << 17;
+        public const ulong C3 = 1UL << 18;
+        public const ulong D3 = 1UL << 19;
+        public const ulong E3 = 1UL << 20;
+        public const ulong F3 = 1UL << 21;
+        public const ulong G3 = 1UL << 22;
+        public const ulong H3 = 1UL << 23;
+        public const ulong A4 = 1UL << 24;
+        public const ulong B4 = 1UL << 25;
+        public const ulong C4 = 1UL << 26;
+        public const ulong D4 = 1UL << 27;
+        public const ulong E4 = 1UL << 28;
+        public const ulong F4 = 1UL << 29;
+        public const ulong G4 = 1UL << 30;
+        public const ulong H4 = 1UL << 31;
+        public const ulong A5 = 1UL << 32;
+        public const ulong B5 = 1UL << 33;
+        public const ulong C5 = 1UL << 34;
+        public const ulong D5 = 1UL << 35;
+        public const ulong E5 = 1UL << 36;
+        public const ulong F5 = 1UL << 37;
+        public const ulong G5 = 1UL << 38;
+        public const ulong H5 = 1UL << 39;
+        public const ulong A6 = 1UL << 40;
+        public const ulong B6 = 1UL << 41;
+        public const ulong C6 = 1UL << 42;
+        public const ulong D6 = 1UL << 43;
+        public const ulong E6 = 1UL << 44;
+        public const ulong F6 = 1UL << 45;
+        public const ulong G6 = 1UL << 46;
+        public const ulong H6 = 1UL << 47;
+        public const ulong A7 = 1UL << 48;
+        public const ulong B7 = 1UL << 49;
+        public const ulong C7 = 1UL << 50;
+        public const ulong D7 = 1UL << 51;
+        public const ulong E7 = 1UL << 52;
+        public const ulong F7 = 1UL << 53;
+        public const ulong G7 = 1UL << 54;
+        public const ulong H7 = 1UL << 55;
+        public const ulong A8 = 1UL << 56;
+        public const ulong B8 = 1UL << 57;
+        public const ulong C8 = 1UL << 58;
+        public const ulong D8 = 1UL << 59;
+        public const ulong E8 = 1UL << 60;
+        public const ulong F8 = 1UL << 61;
+        public const ulong G8 = 1UL << 62;
+        public const ulong H8 = 1UL << 63;
+        public static readonly ulong[] Square =
+        {
+            A1, B1, C1, D1, E1, F1, G1, H1,
+            A2, B2, C2, D2, E2, F2, G2, H2,
+            A3, B3, C3, D3, E3, F3, G3, H3,
+            A4, B4, C4, D4, E4, F4, G4, H4,
+            A5, B5, C5, D5, E5, F5, G5, H5,
+            A6, B6, C6, D6, E6, F6, G6, H6,
+            A7, B7, C7, D7, E7, F7, G7, H7,
+            A8, B8, C8, D8, E8, F8, G8, H8,
+        };
     }
     
     public static class Squares
     {
+        public const int Null = 0;
         public const int A1 = 0;
         public const int B1 = 1;
         public const int C1 = 2;

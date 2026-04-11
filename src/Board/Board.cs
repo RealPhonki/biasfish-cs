@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Biasfish.Core
 {
     /// <summary>
@@ -18,9 +20,8 @@ namespace Biasfish.Core
         // piece type and the fourth bit represents the color. Because of this, sideToMove
         // is represented as either 0 (0000) or 8 (1000).
         public int sideToMove;
-
-        // TODO: epSquare will used to add en-passant during legal move generation.
-        public int epSquare;
+        public int currEpSquare;
+        public int lastEpSquare;
 
         // TODO: castlingRights will be used to add castling during legal move generation.
         public int castlingRights;
@@ -73,6 +74,12 @@ namespace Biasfish.Core
                 {
                     Bitboards[index] = 0;
                 }
+
+                // clear mailbox
+                for (int index = 0; index < 64; index++)
+                {
+                    MailBox[index] = Piece.Null;
+                }
                 
                 // parse parts
                 string[] fenParts = fenString.Split(' ');
@@ -105,9 +112,9 @@ namespace Biasfish.Core
                         int square = rank * 8 + file;
 
                         // assign the piece bitboard and occupancy bitboards
-                        Bitboards[pieceType] |= 1UL << square;
-                        Bitboards[pieceColor] |= 1UL << square;
-                        Bitboards[Piece.Any] |= 1UL << square;
+                        Bitboards[pieceType] |= Masks.Square[square];
+                        Bitboards[pieceColor] |= Masks.Square[square];
+                        Bitboards[Piece.Any] |= Masks.Square[square];
 
                         MailBox[square] = (byte)pieceType;
                         
@@ -125,44 +132,174 @@ namespace Biasfish.Core
         {
             unsafe
             {
+                lastEpSquare = currEpSquare;
+                currEpSquare = Squares.Null;
+
+                if      (Flags.IsQuiet(move.Flags))            HandleQuiet(move);
+                else if (Flags.IsCaptureOnly(move.Flags))      HandleCapture(move);
+                else if (Flags.IsDoublePawnPush(move.Flags))   HandleDoublePawnPush(move);
+                else if (Flags.IsKingCastle(move.Flags))       HandleKingCastle(move);
+                else if (Flags.IsQueenCastle(move.Flags))      HandleQueenCastle(move);
+                else if (Flags.IsPromotion(move.Flags))        HandlePromotion(move);
+                else if (Flags.IsEnPassant(move.Flags))        HandleEnPassant(move);
+
                 sideToMove = Piece.FlipColor(sideToMove);
-
-                if (Flag.IsCapture(move.Flags))
-                {
-                    // get piece metadata
-                    int pieceType = PieceAt(move.FromSquare);
-                    int enemyPieceType = PieceAt(move.ToSquare);
-                    int pieceColor = Piece.GetColor(pieceType);
-
-                    // assign the piece bitboard and occupancy bitboards
-                    Bitboards[enemyPieceType] &= 1UL << move.ToSquare; // clear enemy piece
-                    Bitboards[pieceType] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-                    Bitboards[pieceColor] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-                    Bitboards[Piece.Any] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-
-                    MailBox[move.FromSquare] = Piece.None;
-                    MailBox[move.ToSquare] = (byte)pieceType;
-                    
-                    return;
-                }
-                else
-                {
-                    // get piece metadata
-                    int pieceType = PieceAt(move.FromSquare);
-                    int pieceColor = Piece.GetColor(pieceType);
-
-                    // assign the piece bitboard and occupancy bitboards
-                    Bitboards[pieceType] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-                    Bitboards[pieceColor] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-                    Bitboards[Piece.Any] ^= 1UL << move.FromSquare | 1UL << move.ToSquare;
-
-                    MailBox[move.FromSquare] = Piece.None;
-                    MailBox[move.ToSquare] = (byte)pieceType;
-                    
-                    return;
-                }
-                // TODO: Implement other flag cases
             }
+        }
+        private unsafe void HandleQuiet(Move move)
+        {
+            Console.WriteLine("Handling quiet");
+            int pieceType = PieceAt(move.FromSquare);
+
+            Bitboards[pieceType]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[Piece.Any]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+            MailBox[move.FromSquare] = Piece.Null;
+            MailBox[move.ToSquare] = (byte)pieceType;
+        }
+
+        private unsafe void HandleCapture(Move move)
+        {
+            int pieceType = PieceAt(move.FromSquare);
+            int enemyType = PieceAt(move.ToSquare);
+
+            Bitboards[pieceType]   ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[sideToMove]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[Piece.Any]   ^= Masks.Square[move.FromSquare];
+
+            Bitboards[enemyType]   ^= Masks.Square[move.ToSquare];
+            Bitboards[Piece.FlipColor(sideToMove)] ^= Masks.Square[move.ToSquare];
+
+            MailBox[move.FromSquare] = Piece.Null;
+            MailBox[move.ToSquare] = (byte)pieceType;
+        }
+
+        private unsafe void HandleDoublePawnPush(Move move)
+        {
+            HandleQuiet(move);
+            currEpSquare = sideToMove == Piece.White ? move.ToSquare - 8: move.ToSquare + 8;
+        }
+
+        private unsafe void HandleKingCastle(Move move)
+        {
+            if (sideToMove == Piece.White)
+            {
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.G1];
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F1] | Masks.Square[Squares.H1];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.F1] | Masks.Square[Squares.G1] | Masks.Square[Squares.H1];
+                Bitboards[Piece.Any]  ^= Masks.Square[Squares.E1] | Masks.Square[Squares.F1] | Masks.Square[Squares.G1] | Masks.Square[Squares.H1];
+
+                MailBox[Squares.E1] = Piece.Null;
+                MailBox[Squares.F1] = Piece.Rooks;
+                MailBox[Squares.G1] = Piece.Kings;
+                MailBox[Squares.H1] = Piece.Null;
+            }
+            else
+            {
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.G8];
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F8] | Masks.Square[Squares.H8];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.F8] | Masks.Square[Squares.G8] | Masks.Square[Squares.H8];
+                Bitboards[Piece.Any]  ^= Masks.Square[Squares.E8] | Masks.Square[Squares.F8] | Masks.Square[Squares.G8] | Masks.Square[Squares.H8];
+
+                MailBox[Squares.E8] = Piece.Null;
+                MailBox[Squares.F8] = Piece.Rooks | Piece.Black;
+                MailBox[Squares.G8] = Piece.Kings | Piece.Black;
+                MailBox[Squares.H8] = Piece.Null;
+            }
+        }
+
+        private unsafe void HandleQueenCastle(Move move)
+        {
+            if (sideToMove == Piece.White)
+            {
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.A1] | Masks.Square[Squares.D1];
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.C1] | Masks.Square[Squares.E1];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.A1] | Masks.Square[Squares.C1] | Masks.Square[Squares.E1] | Masks.Square[Squares.D1];
+                Bitboards[Piece.Any]  ^= Masks.Square[Squares.A1] | Masks.Square[Squares.C1] | Masks.Square[Squares.E1] | Masks.Square[Squares.D1];
+
+                MailBox[Squares.A1] = Piece.Null;
+                MailBox[Squares.C1] = Piece.Kings;
+                MailBox[Squares.D1] = Piece.Rooks;
+                MailBox[Squares.E1] = Piece.Null;
+            }
+            else
+            {
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.A8] | Masks.Square[Squares.D8];
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.C8] | Masks.Square[Squares.E8];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.A8] | Masks.Square[Squares.C8] | Masks.Square[Squares.E8] | Masks.Square[Squares.D8];
+                Bitboards[Piece.Any]  ^= Masks.Square[Squares.A8] | Masks.Square[Squares.C8] | Masks.Square[Squares.E8] | Masks.Square[Squares.D8];
+
+                MailBox[Squares.A8] = Piece.Null;
+                MailBox[Squares.C8] = Piece.Kings | Piece.Black;
+                MailBox[Squares.D8] = Piece.Rooks | Piece.Black;
+                MailBox[Squares.E8] = Piece.Null;
+            }
+        }
+
+        private unsafe void HandlePromotion(Move move)
+        {
+            int newPiece;
+            switch (move.Flags & ~Flags.Capture)
+            {
+                case Flags.KnightPromote: newPiece = Piece.Knights | sideToMove; break;
+                case Flags.BishopPromote: newPiece = Piece.Bishops | sideToMove; break;
+                case Flags.RookPromote:   newPiece = Piece.Rooks   | sideToMove; break;
+                case Flags.QueenPromote:  newPiece = Piece.Queens  | sideToMove; break;
+                default: throw new UnreachableException($"Illegal move flag: {move.Flags}");
+            }
+
+            if (Flags.IsCapture(move.Flags))
+            {
+                // clear hero pawn
+                Bitboards[Piece.Pawns | sideToMove] ^= Masks.Square[move.FromSquare];
+                Bitboards[Piece.Any]                ^= Masks.Square[move.FromSquare];
+                
+                // create new piece
+                Bitboards[newPiece]   ^= Masks.Square[move.ToSquare];
+                Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+                // clear enemy piece
+                int enemyType = PieceAt(move.ToSquare);
+                Bitboards[enemyType]                 ^= Masks.Square[move.ToSquare];
+                Bitboards[Piece.GetColor(enemyType)] ^= Masks.Square[move.ToSquare];
+            }
+            else
+            {
+                // clear hero pawn
+                Bitboards[Piece.Pawns | sideToMove] ^= Masks.Square[move.FromSquare];
+                
+                // create new piece
+                Bitboards[newPiece]   ^= Masks.Square[move.ToSquare];
+                Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+                Bitboards[Piece.Any]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            }
+
+            // update mailbox
+            MailBox[move.FromSquare] = Piece.Null;
+            MailBox[move.ToSquare]   = (byte)newPiece;
+        }
+
+        private unsafe void HandleEnPassant(Move move)
+        {
+            int captureSquare = (sideToMove == Piece.White) ? move.ToSquare - 8 : move.ToSquare + 8;
+
+            // move hero pawn
+            Bitboards[Piece.Pawns | sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[sideToMove]               ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+            // clear enemy pawn
+            int enemyColor = Piece.FlipColor(sideToMove);
+            Bitboards[Piece.Pawns | enemyColor] ^= Masks.Square[captureSquare];
+            Bitboards[enemyColor]               ^= Masks.Square[captureSquare];
+
+            // update occupation bitboard (clear fromSquare, enemy, and add toSquare)
+            Bitboards[Piece.Any] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare] | Masks.Square[captureSquare];
+
+            // update mailbox
+            MailBox[move.FromSquare] = Piece.Null;
+            MailBox[move.ToSquare] = (byte)(Piece.Pawns | sideToMove);
+            MailBox[captureSquare] = Piece.Null;
         }
 
         /// <summary>

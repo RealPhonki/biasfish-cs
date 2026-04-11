@@ -12,14 +12,14 @@ namespace Biasfish.Core
             ulong captureMoves = attackBitboard & enemy;
             while (captureMoves != 0)
             {
-                moveList.Add(new Move(fromSquare, BitOperations.TrailingZeroCount(captureMoves), Flag.Capture));
+                moveList.Add(new Move(fromSquare, BitOperations.TrailingZeroCount(captureMoves), Flags.Capture));
                 captureMoves &= captureMoves - 1;
             }
 
             ulong quietMoves = attackBitboard & empty;
             while (quietMoves != 0)
             {
-                moveList.Add(new Move(fromSquare, BitOperations.TrailingZeroCount(quietMoves), Flag.Quiet));
+                moveList.Add(new Move(fromSquare, BitOperations.TrailingZeroCount(quietMoves), Flags.Quiet));
                 quietMoves &= quietMoves - 1;
             }
         }

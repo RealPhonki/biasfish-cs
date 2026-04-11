@@ -18,25 +18,25 @@ namespace Biasfish.Core
                 pawns &= Masks.NotRank7;
 
                 ulong singlePushes = (pawns << 8) & empty;
-                SerializeMoves(ref moveList, singlePushes, 8, Flag.Quiet);
+                SerializeMoves(ref moveList, singlePushes, 8, Flags.Quiet);
 
                 ulong doublePushes = ((singlePushes & Masks.Rank3) << 8) & empty;
-                SerializeMoves(ref moveList, doublePushes, 16, Flag.DoublePawnPush);
+                SerializeMoves(ref moveList, doublePushes, 16, Flags.DoublePawnPush);
 
                 ulong leftCaptures = (pawns << 7) & enemy & Masks.NotFileH;
-                SerializeMoves(ref moveList, leftCaptures, 7, Flag.Capture);
+                SerializeMoves(ref moveList, leftCaptures, 7, Flags.Capture);
 
                 ulong rightCaptures = (pawns << 9) & enemy & Masks.NotFileA;
-                SerializeMoves(ref moveList, rightCaptures, 9, Flag.Capture);
+                SerializeMoves(ref moveList, rightCaptures, 9, Flags.Capture);
 
                 ulong quietPromotions = (promotionPawns << 8) & empty;
-                SerializePromotions(ref moveList, quietPromotions, 8, Flag.Quiet);
+                SerializePromotions(ref moveList, quietPromotions, 8, Flags.Quiet);
 
                 ulong leftCapturePromotions = (promotionPawns << 7) & enemy;
-                SerializePromotions(ref moveList, leftCapturePromotions, 7, Flag.Capture);
+                SerializePromotions(ref moveList, leftCapturePromotions, 7, Flags.Capture);
 
                 ulong rightCapturePromotions = (promotionPawns << 9) & enemy;
-                SerializePromotions(ref moveList, rightCapturePromotions, 9, Flag.Capture);
+                SerializePromotions(ref moveList, rightCapturePromotions, 9, Flags.Capture);
             }
             else
             {
@@ -44,25 +44,25 @@ namespace Biasfish.Core
                 pawns &= Masks.NotRank2;
 
                 ulong singlePushes = (pawns >> 8) & empty;
-                SerializeMoves(ref moveList, singlePushes,  -8, Flag.Quiet);
+                SerializeMoves(ref moveList, singlePushes,  -8, Flags.Quiet);
 
                 ulong doublePushes = ((singlePushes & Masks.Rank6) >> 8) & empty;
-                SerializeMoves(ref moveList, doublePushes, -16, Flag.DoublePawnPush);
+                SerializeMoves(ref moveList, doublePushes, -16, Flags.DoublePawnPush);
 
                 ulong leftCaptures = (pawns >> 7) & enemy & Masks.NotFileH;
-                SerializeMoves(ref moveList, leftCaptures, -7, Flag.Capture);
+                SerializeMoves(ref moveList, leftCaptures, -7, Flags.Capture);
 
                 ulong rightCaptures = (pawns >> 9) & enemy & Masks.NotFileA;
-                SerializeMoves(ref moveList, rightCaptures, -9, Flag.Capture);
+                SerializeMoves(ref moveList, rightCaptures, -9, Flags.Capture);
 
                 ulong quietPromotions = (promotionPawns >> 8) & empty;
-                SerializePromotions(ref moveList, quietPromotions, -8, Flag.Quiet);
+                SerializePromotions(ref moveList, quietPromotions, -8, Flags.Quiet);
 
                 ulong leftCapturePromotions = (promotionPawns >> 7) & enemy;
-                SerializePromotions(ref moveList, leftCapturePromotions, -7, Flag.Capture);
+                SerializePromotions(ref moveList, leftCapturePromotions, -7, Flags.Capture);
 
                 ulong rightCapturePromotions = (promotionPawns >> 9) & enemy;
-                SerializePromotions(ref moveList, rightCapturePromotions, -9, Flag.Capture);
+                SerializePromotions(ref moveList, rightCapturePromotions, -9, Flags.Capture);
             }
         }
 
@@ -82,10 +82,10 @@ namespace Biasfish.Core
             while (bitboard != 0)
             {
                 int toSquare = BitOperations.TrailingZeroCount(bitboard);
-                moveList.Add(new Move(toSquare - displacement, toSquare, Flag.KnightPromote | captureFlag));
-                moveList.Add(new Move(toSquare - displacement, toSquare, Flag.BishopPromote | captureFlag));
-                moveList.Add(new Move(toSquare - displacement, toSquare, Flag.RookPromote   | captureFlag));
-                moveList.Add(new Move(toSquare - displacement, toSquare, Flag.QueenPromote  | captureFlag));
+                moveList.Add(new Move(toSquare - displacement, toSquare, Flags.KnightPromote | captureFlag));
+                moveList.Add(new Move(toSquare - displacement, toSquare, Flags.BishopPromote | captureFlag));
+                moveList.Add(new Move(toSquare - displacement, toSquare, Flags.RookPromote   | captureFlag));
+                moveList.Add(new Move(toSquare - displacement, toSquare, Flags.QueenPromote  | captureFlag));
 
                 bitboard &= bitboard - 1;
             }

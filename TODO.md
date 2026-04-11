@@ -1,7 +1,6 @@
 # TODO - Features
-- Add Flag handling in Board.cs/Board.PushMove
-- Add castling
-- Add en-passant
+- Add castling move generation
+- Add en passant move generation
 - Add check detection
 - Get attack bitboard
 - Don't generate king moves onto attacked squares
