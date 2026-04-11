@@ -33,28 +33,12 @@ namespace Biasfish.Core
         public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
             ulong kings = board.Get(Piece.Kings | board.sideToMove);
-
             int fromSquare = BitOperations.TrailingZeroCount(kings);
-            ulong kingAttacks = KingAttacks[fromSquare];
 
-            ulong quietMoves = kingAttacks & ~board.Get(Piece.Any);
-            ulong captureMoves = kingAttacks & board.Get(Piece.FlipColor(board.sideToMove));
-            
-            while (quietMoves != 0)
-            {
-                int toSquare = BitOperations.TrailingZeroCount(quietMoves);
-                moveList.Add(new Move(fromSquare, toSquare, Flag.Quiet));
-
-                quietMoves &= quietMoves - 1;
-            }
-
-            while (captureMoves != 0)
-            {
-                int toSquare = BitOperations.TrailingZeroCount(captureMoves);
-                moveList.Add(new Move(fromSquare, toSquare, Flag.Capture));
-
-                captureMoves &= captureMoves - 1;
-            }
+            MoveGenUtils.SerializeMoves(ref moveList, ref board, KingAttacks[fromSquare], fromSquare);
         }
+
+        // consistency
+        public static ulong GetAttackBitboard(ref Board _, int fromSquare) => KingAttacks[fromSquare];
     }
 }

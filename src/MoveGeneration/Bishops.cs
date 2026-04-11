@@ -14,45 +14,22 @@ namespace Biasfish
         {
             for (int square = 0; square < 64; square++)
             {
-                int x = square % 8 + 1;
-                int y = square / 8 + 1;
+                Raycast(ref NorthEastRay, square,  1,  1);
+                Raycast(ref NorthWestRay, square, -1,  1);
+                Raycast(ref SouthEastRay, square,  1, -1);
+                Raycast(ref SouthWestRay, square, -1, -1);
+            }
+        }
 
-                while (x < 8 && y < 8)
-                {
-                    NorthEastRay[square] |= 1UL << (x + 8 * y);
-                    x++;
-                    y++;
-                }
-
-                x = square % 8 - 1;
-                y = square / 8 + 1;
-
-                while (x >= 0 && y < 8)
-                {
-                    NorthWestRay[square] |= 1UL << (x + 8 * y);
-                    x--;
-                    y++;
-                }
-
-                x = square % 8 + 1;
-                y = square / 8 - 1;
-
-                while (x < 8 && y >= 0)
-                {
-                    SouthEastRay[square] |= 1UL << (x + 8 * y);
-                    x++;
-                    y--;
-                }
-
-                x = square % 8 - 1;
-                y = square / 8 - 1;
-
-                while (x >= 0 && y >= 0)
-                {
-                    SouthWestRay[square] |= 1UL << (x + 8 * y);
-                    x--;
-                    y--;
-                }
+        private static void Raycast(ref ulong[] RayLookup, int fromSquare, int xOffset, int yOffset)
+        {
+            int x = fromSquare % 8 + xOffset;
+            int y = fromSquare / 8 + yOffset;
+            while (x >= 0 && x < 8 && y >= 0 && x < 8)
+            {
+                RayLookup[fromSquare] |= 1UL << (x + y * 8);
+                x += xOffset;
+                y += yOffset;
             }
         }
 
@@ -60,72 +37,46 @@ namespace Biasfish
         {
             ulong bishops = board.Get(Piece.Bishops | board.sideToMove);
 
-            ulong occupied = board.Get(Piece.Any);
-            ulong enemy = board.Get(Piece.FlipColor(board.sideToMove));
-            ulong empty = ~occupied;
-
             while (bishops != 0)
             {
                 int fromSquare = BitOperations.TrailingZeroCount(bishops);
-                ulong bishopAttacks = 0;
-                ulong ray;
-                ulong blockers;
+                ulong bishopAttacks = GetAttackBitboard(ref board, fromSquare);
 
-                // scan north east
-                ray = NorthEastRay[fromSquare];
-                blockers = ray & occupied;
-                if (blockers != 0)
-                {
-                    ray ^= NorthEastRay[BitOperations.TrailingZeroCount(blockers)];
-                }
-                bishopAttacks |= ray;
-
-                // scan north west
-                ray = NorthWestRay[fromSquare];
-                blockers = ray & occupied;
-                if (blockers != 0)
-                {
-                    ray ^= NorthWestRay[BitOperations.TrailingZeroCount(blockers)];
-                }
-                bishopAttacks |= ray;
-
-                ray = SouthEastRay[fromSquare];
-                blockers = ray & occupied;
-                if (blockers != 0)
-                {
-                    ray ^= SouthEastRay[63 - BitOperations.LeadingZeroCount(blockers)];
-                }
-                bishopAttacks |= ray;
-
-                ray = SouthWestRay[fromSquare];
-                blockers = ray & occupied;
-                if (blockers != 0)
-                {
-                    ray ^= SouthWestRay[BitOperations.TrailingZeroCount(blockers)];
-                }
-                bishopAttacks |= ray;
-
+                MoveGenUtils.SerializeMoves(ref moveList, ref board, bishopAttacks, fromSquare);
                 bishops &= bishops - 1;
-
-                ulong quietMoves = bishopAttacks & empty;
-                ulong captureMoves = bishopAttacks & enemy;
-
-                while (quietMoves != 0)
-                {
-                    int toSquare = BitOperations.TrailingZeroCount(quietMoves);
-                    moveList.Add(new Move(fromSquare, toSquare, Flag.Quiet));
-
-                    quietMoves &= quietMoves - 1;
-                }
-
-                while (captureMoves != 0)
-                {
-                    int toSquare = BitOperations.TrailingZeroCount(captureMoves);
-                    moveList.Add(new Move(fromSquare, toSquare, Flag.Capture));
-
-                    captureMoves &= captureMoves - 1;
-                }
             }
+        }
+
+        public static ulong GetAttackBitboard(ref Board board, int fromSquare)
+        {
+            ulong occupied = board.Get(Piece.Any);
+            ulong bishopAttacks = 0;
+            ulong blockers;
+            ulong ray;
+
+            // scan north east
+            ray = NorthEastRay[fromSquare];
+            blockers = ray & occupied;
+            if (blockers != 0) ray ^= NorthEastRay[BitOperations.TrailingZeroCount(blockers)];
+            bishopAttacks |= ray;
+
+            // scan north west
+            ray = NorthWestRay[fromSquare];
+            blockers = ray & occupied;
+            if (blockers != 0) ray ^= NorthWestRay[BitOperations.TrailingZeroCount(blockers)];
+            bishopAttacks |= ray;
+
+            ray = SouthEastRay[fromSquare];
+            blockers = ray & occupied;
+            if (blockers != 0) ray ^= SouthEastRay[63 - BitOperations.LeadingZeroCount(blockers)];
+            bishopAttacks |= ray;
+
+            ray = SouthWestRay[fromSquare];
+            blockers = ray & occupied;
+            if (blockers != 0) ray ^= SouthWestRay[BitOperations.TrailingZeroCount(blockers)];
+            bishopAttacks |= ray;
+
+            return bishopAttacks;
         }
     }
 }
