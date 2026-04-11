@@ -8,7 +8,7 @@ namespace Biasfish
         {
             // initialize board
             Board testBoard = new Board();
-            testBoard.LoadFEN("kq6/qq6/8/8/4B3/8/QQ6/KQ6 w - - 0 1");
+            testBoard.LoadFEN("r1b2rk1/pppp1Npp/2n5/4p3/2Bq3R/5KP1/PPPP4/RNBQ4 b - - 4 11");
 
             Debug.PrintBoard(testBoard);
 
@@ -16,20 +16,22 @@ namespace Biasfish
             Span<Move> memoryBuffer = stackalloc Move[256];
             MoveList moveList = new MoveList(memoryBuffer);
 
+            Pawns.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine($"+Pawn moves,   moveList.Length: {moveList.Length}");
             Knights.GetPseudoLegal(ref testBoard, ref moveList);
             Console.WriteLine($"+Knight moves, moveList.Length: {moveList.Length}");
-            Kings.GetPseudoLegal(ref testBoard, ref moveList);
-            Console.WriteLine($"+King moves,   moveList.Length: {moveList.Length}");
-            //Pawns.GetPseudoLegal(ref testBoard, ref moveList);
-            //Console.WriteLine($"+Pawn moves,   moveList.Length: {moveList.Length}");
-            Rooks.GetPseudoLegal(ref testBoard, ref moveList);
-            Console.WriteLine($"+Rook moves,   moveList.Length: {moveList.Length}");
             Bishops.GetPseudoLegal(ref testBoard, ref moveList);
             Console.WriteLine($"+Bishop Moves, moveList.Length: {moveList.Length}");
+            Rooks.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine($"+Rook moves,   moveList.Length: {moveList.Length}");
+            Queens.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine($"+Queen moves,  moveList.Length: {moveList.Length}");
+            Kings.GetPseudoLegal(ref testBoard, ref moveList);
+            Console.WriteLine($"+King moves,   moveList.Length: {moveList.Length}");
 
             for (int i=0; i<moveList.Length; i++)
             {
-                Console.WriteLine($"{i}: {moveList[i]}");
+                Console.WriteLine($"{i + 1}: {moveList[i]}");
             }
         }
     }

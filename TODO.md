@@ -1,6 +1,5 @@
 # TODO - Features
 - Add Flag handling in Board.cs/Board.PushMove
-- Add Queen moves and captures
 - Add castling
 - Add en-passant
 - Add check detection

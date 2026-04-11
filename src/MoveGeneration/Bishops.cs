@@ -25,7 +25,7 @@ namespace Biasfish
         {
             int x = fromSquare % 8 + xOffset;
             int y = fromSquare / 8 + yOffset;
-            while (x >= 0 && x < 8 && y >= 0 && x < 8)
+            while (x >= 0 && x < 8 && y >= 0 && y < 8)
             {
                 RayLookup[fromSquare] |= 1UL << (x + y * 8);
                 x += xOffset;
@@ -73,7 +73,7 @@ namespace Biasfish
 
             ray = SouthWestRay[fromSquare];
             blockers = ray & occupied;
-            if (blockers != 0) ray ^= SouthWestRay[BitOperations.TrailingZeroCount(blockers)];
+            if (blockers != 0) ray ^= SouthWestRay[63 - BitOperations.LeadingZeroCount(blockers)];
             bishopAttacks |= ray;
 
             return bishopAttacks;
