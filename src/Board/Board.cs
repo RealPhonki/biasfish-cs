@@ -27,7 +27,6 @@ namespace Biasfish.Core
         // Castling rights are represented with 4 bits with the following format:
         // (black queenside)(black kingside)(white queenside)(white kingside)
         public int castlingRights;
-
         // TODO: halfMoveClock will be used to track the 50 move rule.
         public int halfMoveClock;
 
@@ -124,6 +123,25 @@ namespace Biasfish.Core
                     }
                 }
             }
+        }
+
+        public bool CanWhiteCastleKingside()
+        {
+            return (castlingRights & CastlingRights.WhiteKingSide) != 0;
+        }
+
+        public bool CanWhiteCastleQueenside()
+        {
+            return (castlingRights & CastlingRights.WhiteQueenSide) != 0;
+        }
+        public bool CanBlackCastleKingside()
+        {
+            return (castlingRights & CastlingRights.BlackKingSide) != 0;
+        }
+
+        public bool CanBlackCastleQueenside()
+        {
+            return (castlingRights & CastlingRights.BlackQueenSide) != 0;
         }
 
         /// <summary>
