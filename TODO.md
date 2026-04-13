@@ -1,7 +1,5 @@
 # TODO - Features
 - Load FEN metadata
-- Add castling move generation
-- Add en passant move generation
 - Add check detection
 - Get attack bitboard
 - Don't generate king moves onto attacked squares

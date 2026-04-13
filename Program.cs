@@ -8,7 +8,14 @@ namespace Biasfish
         {
             // initialize board
             Board testBoard = new Board();
-            testBoard.LoadFEN("5b2/5pkp/1Rr3p1/6P1/8/5K2/8/8 w - - 0 1");
+            testBoard.LoadFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
+            testBoard.Push(new Move(Squares.E2, Squares.E4, Flags.Quiet));
+            testBoard.Push(new Move(Squares.E7, Squares.E5, Flags.Quiet));
+            testBoard.Push(new Move(Squares.G1, Squares.F3, Flags.Quiet));
+            testBoard.Push(new Move(Squares.B8, Squares.C6, Flags.Quiet));
+            testBoard.Push(new Move(Squares.F1, Squares.B5, Flags.Quiet));
+            testBoard.Push(new Move(Squares.G8, Squares.F6, Flags.Quiet));
 
             Debug.PrintBoard(testBoard);
 

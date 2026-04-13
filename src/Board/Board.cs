@@ -84,8 +84,19 @@ namespace Biasfish.Core
                 
                 // parse parts
                 string[] fenParts = fenString.Split(' ');
+
+                // parse board
                 string fenBoard = fenParts[0];
+
+                // parse turn
                 sideToMove = fenParts[1] == "w" ? Piece.White : Piece.Black;
+
+                // parse rights
+                castlingRights = 0;
+                if (fenParts[2][0] == 'K') castlingRights |= CastlingRights.WhiteKingSide;
+                if (fenParts[2][1] == 'Q') castlingRights |= CastlingRights.WhiteQueenSide;
+                if (fenParts[2][2] == 'k') castlingRights |= CastlingRights.BlackKingSide;
+                if (fenParts[2][3] == 'q') castlingRights |= CastlingRights.BlackQueenSide;
 
                 // parse fenBoard starting at the top left moving rightwards
                 int rank = 7;
