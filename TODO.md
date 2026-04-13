@@ -1,5 +1,4 @@
 # TODO - Features
-- Generate castling in pseudo legal
 - Generate En Passant in pseudo legal
 - Add castling move generation
 - Add en passant move generation
