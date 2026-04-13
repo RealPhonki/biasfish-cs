@@ -32,15 +32,17 @@ namespace Biasfish.Core
 
         public static void SerializeCastling(ref Board board, ref MoveList moveList)
         {
+            ulong occupied = board.GetOccupied();
+
             if (board.sideToMove == Piece.White)
             {
                 // kingside
-                if (board.CanWhiteCastleKingside() && (board.Get(Piece.Any) & (Masks.F1 | Masks.G1)) == 0)
+                if (board.CanWhiteCastleKingside() && (occupied & (Masks.F1 | Masks.G1)) == 0)
                 {
                     moveList.Add(new Move(Squares.E1, Squares.G1, Flags.KingCastle));
                 }
                 // queenside
-                if (board.CanWhiteCastleQueenside() && (board.Get(Piece.Any) & (Masks.B1 | Masks.C1 | Masks.D1)) == 0)
+                if (board.CanWhiteCastleQueenside() && (occupied & (Masks.B1 | Masks.C1 | Masks.D1)) == 0)
                 {
                     moveList.Add(new Move(Squares.E1, Squares.C1, Flags.QueenCastle));
                 }
@@ -48,12 +50,12 @@ namespace Biasfish.Core
             else
             {
                 // kingside
-                if (board.CanBlackCastleKingside() && (board.Get(Piece.Any) & (Masks.F8 | Masks.G8)) == 0)
+                if (board.CanBlackCastleKingside() && (occupied & (Masks.F8 | Masks.G8)) == 0)
                 {
                     moveList.Add(new Move(Squares.E8, Squares.G8, Flags.KingCastle));
                 }
                 // queenside
-                if (board.CanBlackCastleQueenside() && (board.Get(Piece.Any) & (Masks.B8 | Masks.C8 | Masks.D8)) == 0)
+                if (board.CanBlackCastleQueenside() && (occupied & (Masks.B8 | Masks.C8 | Masks.D8)) == 0)
                 {
                     moveList.Add(new Move(Squares.E8, Squares.C8, Flags.QueenCastle));
                 }

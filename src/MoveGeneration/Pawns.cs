@@ -4,47 +4,43 @@ namespace Biasfish.Core
 {
     public static class Pawns
     {
-        public static readonly int[] PawnPushes = new int[64];
 
         private static void SerializeEnPassant(ref Board board, ref MoveList MoveList, ulong pawns)
         {
-            if (board.currEpSquare == Squares.Null)
-            {
-                return;
-            }
+            if (board.currEpSquare == Squares.Null) return;
 
-            int fromSquare;
+            ulong epTarget = 1UL << board.currEpSquare;
 
             if (board.sideToMove == Piece.White)
             {
                 // back right attacker
-                fromSquare = board.currEpSquare - 7;
-                if ((1UL << fromSquare & pawns) != 0)
+                ulong rightAttacker = (epTarget >> 9) & Masks.NotFileA & pawns;
+                if (rightAttacker != 0)
                 {
-                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                    MoveList.Add(new Move(BitOperations.TrailingZeroCount(rightAttacker), board.currEpSquare, Flags.EnPassant));
                 }
 
                 // back left attacker
-                fromSquare = board.currEpSquare - 9;
-                if ((1UL << fromSquare & pawns) != 0)
+                ulong leftAttacker = (epTarget >> 7) & Masks.NotFileH & pawns;
+                if (leftAttacker != 0)
                 {
-                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                    MoveList.Add(new Move(BitOperations.TrailingZeroCount(leftAttacker), board.currEpSquare, Flags.EnPassant));
                 }
             }
             else
             {
-                // back right attacker
-                fromSquare = board.currEpSquare + 7;
-                if ((1UL << fromSquare & pawns) != 0)
+                // back right attacker (black's perspective)
+                ulong rightAttacker = (epTarget << 9) & Masks.NotFileA & pawns;
+                if (rightAttacker != 0)
                 {
-                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                    MoveList.Add(new Move(BitOperations.TrailingZeroCount(rightAttacker), board.currEpSquare, Flags.EnPassant));
                 }
 
-                // back left attacker
-                fromSquare = board.currEpSquare + 9;
-                if ((1UL << fromSquare & pawns) != 0)
+                // back left attacker (black's perspective)
+                ulong leftAttacker = (epTarget << 7) & Masks.NotFileH & pawns;
+                if (leftAttacker != 0)
                 {
-                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                    MoveList.Add(new Move(BitOperations.TrailingZeroCount(leftAttacker), board.currEpSquare, Flags.EnPassant));
                 }
             }
         }
@@ -52,7 +48,7 @@ namespace Biasfish.Core
         public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
             ulong pawns = board.Get(Piece.Pawns | board.sideToMove);
-            ulong empty = ~board.Get(Piece.Any);
+            ulong empty = ~board.GetOccupied();
             ulong enemy = board.Get(Piece.FlipColor(board.sideToMove));
 
             SerializeEnPassant(ref board, ref moveList, pawns);
@@ -77,10 +73,10 @@ namespace Biasfish.Core
                 ulong quietPromotions = (promotionPawns << 8) & empty;
                 SerializePromotions(ref moveList, quietPromotions, 8, Flags.Quiet);
 
-                ulong leftCapturePromotions = (promotionPawns << 7) & enemy;
+                ulong leftCapturePromotions = (promotionPawns << 7) & enemy & Masks.NotFileH;
                 SerializePromotions(ref moveList, leftCapturePromotions, 7, Flags.Capture);
 
-                ulong rightCapturePromotions = (promotionPawns << 9) & enemy;
+                ulong rightCapturePromotions = (promotionPawns << 9) & enemy & Masks.NotFileA;
                 SerializePromotions(ref moveList, rightCapturePromotions, 9, Flags.Capture);
             }
             else
@@ -103,10 +99,10 @@ namespace Biasfish.Core
                 ulong quietPromotions = (promotionPawns >> 8) & empty;
                 SerializePromotions(ref moveList, quietPromotions, -8, Flags.Quiet);
 
-                ulong leftCapturePromotions = (promotionPawns >> 7) & enemy;
+                ulong leftCapturePromotions = (promotionPawns >> 7) & enemy & Masks.NotFileH;
                 SerializePromotions(ref moveList, leftCapturePromotions, -7, Flags.Capture);
 
-                ulong rightCapturePromotions = (promotionPawns >> 9) & enemy;
+                ulong rightCapturePromotions = (promotionPawns >> 9) & enemy & Masks.NotFileA;
                 SerializePromotions(ref moveList, rightCapturePromotions, -9, Flags.Capture);
             }
         }

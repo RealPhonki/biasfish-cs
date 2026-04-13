@@ -11,12 +11,12 @@ namespace Biasfish.Core
         private Span<Move> moves;
 
         // Represents the number of move elements.
-        public int Length;
+        public int count;
 
         public MoveList(Span<Move> allocatedMemory)
         {
             moves = allocatedMemory;
-            Length = 0;
+            count = 0;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Biasfish.Core
         {
             // Length++ is evaluated after indexing.
             // If written as `++Length` it would be evaluated before (causing errors)
-            moves[Length++] = move;
+            moves[count++] = move;
         }
 
         public Move this[int index]

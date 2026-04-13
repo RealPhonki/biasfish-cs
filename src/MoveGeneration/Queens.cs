@@ -12,7 +12,8 @@ namespace Biasfish
             while (queens != 0)
             {
                 int fromSquare = BitOperations.TrailingZeroCount(queens);
-                ulong queenAttacks = Rooks.GetAttackBitboard(ref board, fromSquare) | Bishops.GetAttackBitboard(ref board, fromSquare);
+                ulong occupied = board.GetOccupied();
+                ulong queenAttacks = Rooks.GetAttackBitboard(fromSquare, occupied) | Bishops.GetAttackBitboard(fromSquare, occupied);
 
                 MoveGeneration.SerializeMoves(ref board, ref moveList, queenAttacks, fromSquare);
                 queens &= queens - 1;

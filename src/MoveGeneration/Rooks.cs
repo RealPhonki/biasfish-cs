@@ -31,41 +31,40 @@ namespace Biasfish
             while (rooks != 0)
             {
                 int fromSquare = BitOperations.TrailingZeroCount(rooks);
-                ulong rookAttacks = GetAttackBitboard(ref board, fromSquare);
+                ulong rookAttacks = GetAttackBitboard(fromSquare, board.GetOccupied());
 
                 MoveGeneration.SerializeMoves(ref board, ref moveList, rookAttacks, fromSquare);
                 rooks &= rooks - 1;
             }
         }
 
-        public static ulong GetAttackBitboard(ref Board board, int fromSquare)
+        public static ulong GetAttackBitboard(int square, ulong occupied)
         {
-            ulong occupied = board.Get(Piece.Any);
             ulong rookAttacks = 0;
             ulong blockers;
             ulong ray;
 
             // scan north (first blocker is at a higher bit)
-            ray = NorthRay[fromSquare];
+            ray = NorthRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= NorthRay[BitOperations.TrailingZeroCount(blockers)];
             rookAttacks |= ray;
 
             // scan east (first blocker is at a higher bit)
-            ray = EastRay[fromSquare];
+            ray = EastRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= EastRay[BitOperations.TrailingZeroCount(blockers)];
             rookAttacks |= ray;
 
             // scan south (first blocker is at a lower bit)
-            ray = SouthRay[fromSquare];
+            ray = SouthRay[square];
             blockers = ray & occupied;
             
             if (blockers != 0) ray ^= SouthRay[63 - BitOperations.LeadingZeroCount(blockers)];
             rookAttacks |= ray;
 
             // scan west (first blocker is at a lower bit)
-            ray = WestRay[fromSquare];
+            ray = WestRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= WestRay[63 - BitOperations.LeadingZeroCount(blockers)];
             rookAttacks |= ray;

@@ -40,38 +40,37 @@ namespace Biasfish
             while (bishops != 0)
             {
                 int fromSquare = BitOperations.TrailingZeroCount(bishops);
-                ulong bishopAttacks = GetAttackBitboard(ref board, fromSquare);
+                ulong bishopAttacks = GetAttackBitboard(fromSquare, board.GetOccupied());
 
                 MoveGeneration.SerializeMoves(ref board, ref moveList, bishopAttacks, fromSquare);
                 bishops &= bishops - 1;
             }
         }
 
-        public static ulong GetAttackBitboard(ref Board board, int fromSquare)
+        public static ulong GetAttackBitboard(int square, ulong occupied)
         {
-            ulong occupied = board.Get(Piece.Any);
             ulong bishopAttacks = 0;
             ulong blockers;
             ulong ray;
 
             // scan north east
-            ray = NorthEastRay[fromSquare];
+            ray = NorthEastRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= NorthEastRay[BitOperations.TrailingZeroCount(blockers)];
             bishopAttacks |= ray;
 
             // scan north west
-            ray = NorthWestRay[fromSquare];
+            ray = NorthWestRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= NorthWestRay[BitOperations.TrailingZeroCount(blockers)];
             bishopAttacks |= ray;
 
-            ray = SouthEastRay[fromSquare];
+            ray = SouthEastRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= SouthEastRay[63 - BitOperations.LeadingZeroCount(blockers)];
             bishopAttacks |= ray;
 
-            ray = SouthWestRay[fromSquare];
+            ray = SouthWestRay[square];
             blockers = ray & occupied;
             if (blockers != 0) ray ^= SouthWestRay[63 - BitOperations.LeadingZeroCount(blockers)];
             bishopAttacks |= ray;

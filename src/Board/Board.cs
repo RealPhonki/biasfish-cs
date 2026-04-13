@@ -126,7 +126,6 @@ namespace Biasfish.Core
                         // assign the piece bitboard and occupancy bitboards
                         Bitboards[pieceType] |= Masks.Square[square];
                         Bitboards[pieceColor] |= Masks.Square[square];
-                        Bitboards[Piece.Any] |= Masks.Square[square];
 
                         MailBox[square] = (byte)pieceType;
                         
@@ -228,7 +227,6 @@ namespace Biasfish.Core
         {
             Bitboards[pieceType]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
             Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
-            Bitboards[Piece.Any]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
 
             MailBox[move.FromSquare] = Piece.Null;
             MailBox[move.ToSquare] = (byte)pieceType;
@@ -240,7 +238,6 @@ namespace Biasfish.Core
 
             Bitboards[pieceType]   ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
             Bitboards[sideToMove]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
-            Bitboards[Piece.Any]   ^= Masks.Square[move.FromSquare];
 
             Bitboards[enemyType]   ^= Masks.Square[move.ToSquare];
             Bitboards[Piece.FlipColor(sideToMove)] ^= Masks.Square[move.ToSquare];
@@ -265,7 +262,6 @@ namespace Biasfish.Core
                 Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.G1];
                 Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F1] | Masks.Square[Squares.H1];
                 Bitboards[sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.F1] | Masks.Square[Squares.G1] | Masks.Square[Squares.H1];
-                Bitboards[Piece.Any]  ^= Masks.Square[Squares.E1] | Masks.Square[Squares.F1] | Masks.Square[Squares.G1] | Masks.Square[Squares.H1];
 
                 MailBox[Squares.E1] = Piece.Null;
                 MailBox[Squares.F1] = Piece.Rooks;
@@ -280,7 +276,6 @@ namespace Biasfish.Core
                 Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.G8];
                 Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F8] | Masks.Square[Squares.H8];
                 Bitboards[sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.F8] | Masks.Square[Squares.G8] | Masks.Square[Squares.H8];
-                Bitboards[Piece.Any]  ^= Masks.Square[Squares.E8] | Masks.Square[Squares.F8] | Masks.Square[Squares.G8] | Masks.Square[Squares.H8];
 
                 MailBox[Squares.E8] = Piece.Null;
                 MailBox[Squares.F8] = Piece.Rooks | Piece.Black;
@@ -296,7 +291,6 @@ namespace Biasfish.Core
                 Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.A1] | Masks.Square[Squares.D1];
                 Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.C1] | Masks.Square[Squares.E1];
                 Bitboards[sideToMove] ^= Masks.Square[Squares.A1] | Masks.Square[Squares.C1] | Masks.Square[Squares.E1] | Masks.Square[Squares.D1];
-                Bitboards[Piece.Any]  ^= Masks.Square[Squares.A1] | Masks.Square[Squares.C1] | Masks.Square[Squares.E1] | Masks.Square[Squares.D1];
 
                 MailBox[Squares.A1] = Piece.Null;
                 MailBox[Squares.C1] = Piece.Kings;
@@ -308,7 +302,6 @@ namespace Biasfish.Core
                 Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.A8] | Masks.Square[Squares.D8];
                 Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.C8] | Masks.Square[Squares.E8];
                 Bitboards[sideToMove] ^= Masks.Square[Squares.A8] | Masks.Square[Squares.C8] | Masks.Square[Squares.E8] | Masks.Square[Squares.D8];
-                Bitboards[Piece.Any]  ^= Masks.Square[Squares.A8] | Masks.Square[Squares.C8] | Masks.Square[Squares.E8] | Masks.Square[Squares.D8];
 
                 MailBox[Squares.A8] = Piece.Null;
                 MailBox[Squares.C8] = Piece.Kings | Piece.Black;
@@ -333,7 +326,6 @@ namespace Biasfish.Core
             {
                 // clear hero pawn
                 Bitboards[Piece.Pawns | sideToMove] ^= Masks.Square[move.FromSquare];
-                Bitboards[Piece.Any]                ^= Masks.Square[move.FromSquare];
                 
                 // create new piece
                 Bitboards[newPiece]   ^= Masks.Square[move.ToSquare];
@@ -352,7 +344,6 @@ namespace Biasfish.Core
                 // create new piece
                 Bitboards[newPiece]   ^= Masks.Square[move.ToSquare];
                 Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
-                Bitboards[Piece.Any]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
             }
 
             // update mailbox
@@ -373,13 +364,18 @@ namespace Biasfish.Core
             Bitboards[Piece.Pawns | enemyColor] ^= Masks.Square[captureSquare];
             Bitboards[enemyColor]               ^= Masks.Square[captureSquare];
 
-            // update occupation bitboard (clear fromSquare, enemy, and add toSquare)
-            Bitboards[Piece.Any] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare] | Masks.Square[captureSquare];
-
             // update mailbox
             MailBox[move.FromSquare] = Piece.Null;
             MailBox[move.ToSquare] = (byte)(Piece.Pawns | sideToMove);
             MailBox[captureSquare] = Piece.Null;
+        }
+
+        public ulong GetOccupied()
+        {
+            unsafe
+            {
+                return Bitboards[Piece.White] | Bitboards[Piece.Black];
+            }
         }
 
         /// <summary>
