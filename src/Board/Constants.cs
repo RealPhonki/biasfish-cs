@@ -71,7 +71,7 @@ namespace Biasfish.Core
         public const int KingCastle = 2;
         public const int QueenCastle = 3;
         public const int Capture = 4;
-        public const int EpCapture = 5;
+        public const int EnPassant = 5;
         public const int Promotion = 8;
         public const int KnightPromote = 8;
         public const int BishopPromote = 9;
@@ -88,7 +88,7 @@ namespace Biasfish.Core
         public static bool IsDoublePawnPush(int flags) => flags == DoublePawnPush;
         public static bool IsKingCastle(int flags) => flags == KingCastle;
         public static bool IsQueenCastle(int flags) => flags == QueenCastle;
-        public static bool IsEnPassant(int flags) => flags == EpCapture;
+        public static bool IsEnPassant(int flags) => flags == EnPassant;
         public static bool IsPromotion(int flags) => (flags & Promotion) != 0;
     }
 

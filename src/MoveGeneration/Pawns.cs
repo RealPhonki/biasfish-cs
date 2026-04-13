@@ -6,11 +6,56 @@ namespace Biasfish.Core
     {
         public static readonly int[] PawnPushes = new int[64];
 
+        private static void SerializeEnPassant(ref Board board, ref MoveList MoveList, ulong pawns)
+        {
+            if (board.currEpSquare == Squares.Null)
+            {
+                return;
+            }
+
+            int fromSquare;
+
+            if (board.sideToMove == Piece.White)
+            {
+                // back right attacker
+                fromSquare = board.currEpSquare - 7;
+                if ((1UL << fromSquare & pawns) != 0)
+                {
+                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                }
+
+                // back left attacker
+                fromSquare = board.currEpSquare - 9;
+                if ((1UL << fromSquare & pawns) != 0)
+                {
+                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                }
+            }
+            else
+            {
+                // back right attacker
+                fromSquare = board.currEpSquare + 7;
+                if ((1UL << fromSquare & pawns) != 0)
+                {
+                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                }
+
+                // back left attacker
+                fromSquare = board.currEpSquare + 9;
+                if ((1UL << fromSquare & pawns) != 0)
+                {
+                    MoveList.Add(new Move(fromSquare, board.currEpSquare, Flags.EnPassant));
+                }
+            }
+        }
+
         public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
         {
             ulong pawns = board.Get(Piece.Pawns | board.sideToMove);
             ulong empty = ~board.Get(Piece.Any);
             ulong enemy = board.Get(Piece.FlipColor(board.sideToMove));
+
+            SerializeEnPassant(ref board, ref moveList, pawns);
 
             if (board.sideToMove == Piece.White)
             {

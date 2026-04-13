@@ -1,5 +1,5 @@
 # TODO - Features
-- Generate En Passant in pseudo legal
+- Load FEN metadata
 - Add castling move generation
 - Add en passant move generation
 - Add check detection

@@ -30,7 +30,7 @@ namespace Biasfish.Core
             }
         }
 
-        public static void HandleCastling(ref Board board, ref MoveList moveList)
+        public static void SerializeCastling(ref Board board, ref MoveList moveList)
         {
             if (board.sideToMove == Piece.White)
             {
@@ -65,7 +65,7 @@ namespace Biasfish.Core
             ulong kings = board.Get(Piece.Kings | board.sideToMove);
             int fromSquare = BitOperations.TrailingZeroCount(kings);
 
-            HandleCastling(ref board, ref moveList);
+            SerializeCastling(ref board, ref moveList);
 
             MoveGenUtils.SerializeMoves(ref moveList, ref board, KingAttacks[fromSquare], fromSquare);
         }
