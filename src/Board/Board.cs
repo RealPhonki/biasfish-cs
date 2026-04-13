@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection.Metadata;
 
 namespace Biasfish.Core
 {
@@ -16,14 +17,15 @@ namespace Biasfish.Core
 
         public unsafe fixed byte MailBox[64];
 
-        // Pieces are represented with 4-bits where the first three bits represent the
+        // Pieces are represented with 4 bits where the first three bits represent the
         // piece type and the fourth bit represents the color. Because of this, sideToMove
         // is represented as either 0 (0000) or 8 (1000).
         public int sideToMove;
         public int currEpSquare;
         public int lastEpSquare;
 
-        // TODO: castlingRights will be used to add castling during legal move generation.
+        // Castling rights are represented with 4 bits with the following format:
+        // (black queenside)(black kingside)(white queenside)(white kingside)
         public int castlingRights;
 
         // TODO: halfMoveClock will be used to track the 50 move rule.
@@ -132,25 +134,69 @@ namespace Biasfish.Core
         {
             unsafe
             {
+                // parse move data
+                int pieceType = PieceAt(move.FromSquare);
+
                 lastEpSquare = currEpSquare;
                 currEpSquare = Squares.Null;
 
-                if      (Flags.IsQuiet(move.Flags))            HandleQuiet(move);
-                else if (Flags.IsCaptureOnly(move.Flags))      HandleCapture(move);
-                else if (Flags.IsDoublePawnPush(move.Flags))   HandleDoublePawnPush(move);
-                else if (Flags.IsKingCastle(move.Flags))       HandleKingCastle(move);
-                else if (Flags.IsQueenCastle(move.Flags))      HandleQueenCastle(move);
-                else if (Flags.IsPromotion(move.Flags))        HandlePromotion(move);
-                else if (Flags.IsEnPassant(move.Flags))        HandleEnPassant(move);
+                // Update castling rights
+                int neutralType = Piece.GetNeutral(pieceType);
+                if (neutralType == Piece.Rooks)              HandleRookMoves(move);
+                if (neutralType == Piece.Kings)              HandleKingMoves(move);
+
+                if      (Flags.IsQuiet(move.Flags))          HandleQuiet(move, pieceType);
+                else if (Flags.IsCaptureOnly(move.Flags))    HandleCapture(move, pieceType);
+                else if (Flags.IsDoublePawnPush(move.Flags)) HandleDoublePawnPush(move, pieceType);
+                else if (Flags.IsKingCastle(move.Flags))     HandleKingCastle(move);
+                else if (Flags.IsQueenCastle(move.Flags))    HandleQueenCastle(move);
+                else if (Flags.IsPromotion(move.Flags))      HandlePromotion(move);
+                else if (Flags.IsEnPassant(move.Flags))      HandleEnPassant(move);
 
                 sideToMove = Piece.FlipColor(sideToMove);
             }
         }
-        private unsafe void HandleQuiet(Move move)
-        {
-            Console.WriteLine("Handling quiet");
-            int pieceType = PieceAt(move.FromSquare);
 
+        private void HandleRookMoves(Move move)
+        {
+            if (sideToMove == Piece.White)
+            {
+                if (move.FromSquare == Squares.A1)
+                {
+                    castlingRights &= CastlingRights.WhiteQueenSideMask;
+                }
+                else if (move.FromSquare == Squares.H1)
+                {
+                    castlingRights &= CastlingRights.WhiteKingSideMask;
+                }
+            }
+            else
+            {
+                if (move.FromSquare == Squares.A8)
+                {
+                    castlingRights &= CastlingRights.BlackQueenSideMask;
+                }
+                else if (move.FromSquare == Squares.H8)
+                {
+                    castlingRights &= CastlingRights.BlackKingSideMask;
+                }
+            }
+        }
+
+        private void HandleKingMoves(Move move)
+        {
+            if (sideToMove == Piece.White)
+            {
+                castlingRights &= CastlingRights.WhiteMask;
+            }
+            else
+            {
+                castlingRights &= CastlingRights.BlackMask;
+            }
+        }
+
+        private unsafe void HandleQuiet(Move move, int pieceType)
+        {
             Bitboards[pieceType]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
             Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
             Bitboards[Piece.Any]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
@@ -159,9 +205,8 @@ namespace Biasfish.Core
             MailBox[move.ToSquare] = (byte)pieceType;
         }
 
-        private unsafe void HandleCapture(Move move)
+        private unsafe void HandleCapture(Move move, int pieceType)
         {
-            int pieceType = PieceAt(move.FromSquare);
             int enemyType = PieceAt(move.ToSquare);
 
             Bitboards[pieceType]   ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
@@ -175,9 +220,9 @@ namespace Biasfish.Core
             MailBox[move.ToSquare] = (byte)pieceType;
         }
 
-        private unsafe void HandleDoublePawnPush(Move move)
+        private unsafe void HandleDoublePawnPush(Move move, int pieceType)
         {
-            HandleQuiet(move);
+            HandleQuiet(move, pieceType);
             currEpSquare = sideToMove == Piece.White ? move.ToSquare - 8: move.ToSquare + 8;
         }
 
@@ -185,6 +230,9 @@ namespace Biasfish.Core
         {
             if (sideToMove == Piece.White)
             {
+                // update castling rights
+                castlingRights &= CastlingRights.WhiteMask;
+                
                 Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.G1];
                 Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F1] | Masks.Square[Squares.H1];
                 Bitboards[sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.F1] | Masks.Square[Squares.G1] | Masks.Square[Squares.H1];
@@ -197,6 +245,9 @@ namespace Biasfish.Core
             }
             else
             {
+                // update castling rights
+                castlingRights &= CastlingRights.BlackMask;
+
                 Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.G8];
                 Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F8] | Masks.Square[Squares.H8];
                 Bitboards[sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.F8] | Masks.Square[Squares.G8] | Masks.Square[Squares.H8];
