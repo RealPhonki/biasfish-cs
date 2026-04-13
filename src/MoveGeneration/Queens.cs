@@ -14,7 +14,7 @@ namespace Biasfish
                 int fromSquare = BitOperations.TrailingZeroCount(queens);
                 ulong queenAttacks = Rooks.GetAttackBitboard(ref board, fromSquare) | Bishops.GetAttackBitboard(ref board, fromSquare);
 
-                MoveGenUtils.SerializeMoves(ref moveList, ref board, queenAttacks, fromSquare);
+                MoveGeneration.SerializeMoves(ref board, ref moveList, queenAttacks, fromSquare);
                 queens &= queens - 1;
             }
         }

@@ -42,7 +42,7 @@ namespace Biasfish
                 int fromSquare = BitOperations.TrailingZeroCount(bishops);
                 ulong bishopAttacks = GetAttackBitboard(ref board, fromSquare);
 
-                MoveGenUtils.SerializeMoves(ref moveList, ref board, bishopAttacks, fromSquare);
+                MoveGeneration.SerializeMoves(ref board, ref moveList, bishopAttacks, fromSquare);
                 bishops &= bishops - 1;
             }
         }

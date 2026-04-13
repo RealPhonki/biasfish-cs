@@ -67,7 +67,7 @@ namespace Biasfish.Core
 
             SerializeCastling(ref board, ref moveList);
 
-            MoveGenUtils.SerializeMoves(ref moveList, ref board, KingAttacks[fromSquare], fromSquare);
+            MoveGeneration.SerializeMoves(ref board, ref moveList, KingAttacks[fromSquare], fromSquare);
         }
 
         // consistency

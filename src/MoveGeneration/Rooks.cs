@@ -33,7 +33,7 @@ namespace Biasfish
                 int fromSquare = BitOperations.TrailingZeroCount(rooks);
                 ulong rookAttacks = GetAttackBitboard(ref board, fromSquare);
 
-                MoveGenUtils.SerializeMoves(ref moveList, ref board, rookAttacks, fromSquare);
+                MoveGeneration.SerializeMoves(ref board, ref moveList, rookAttacks, fromSquare);
                 rooks &= rooks - 1;
             }
         }

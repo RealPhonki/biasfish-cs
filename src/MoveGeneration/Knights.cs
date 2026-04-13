@@ -46,7 +46,7 @@ namespace Biasfish.Core
             {
                 int fromSquare = BitOperations.TrailingZeroCount(knights);
 
-                MoveGenUtils.SerializeMoves(ref moveList, ref board, KnightAttacks[fromSquare], fromSquare);
+                MoveGeneration.SerializeMoves(ref board, ref moveList, KnightAttacks[fromSquare], fromSquare);
                 knights &= knights - 1;
             }
         }
