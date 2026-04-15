@@ -1,4 +1,5 @@
 # TODO - Features
+- Correct Perft results
 - Load FEN metadata
 - Add check detection
 - Get attack bitboard

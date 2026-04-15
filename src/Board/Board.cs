@@ -1,21 +1,32 @@
 using System.Diagnostics;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 
 namespace Biasfish.Core
 {
+    public struct BoardState
+    {
+        public int EpSquare;
+        public int CastlingRights;
+        public int HalfmoveClock;
+        public int CapturedPiece;
+    }
+
     /// <summary>
     /// Represents a board state and metadata.
     /// * Note: This struct should be passed into methods using the `ref` keyword.
     /// </summary>
     public struct Board
     {
+        private BoardState[] stateHistory;
+        private int plyCount;
         // The board state is represented by 12 unsigned 64-bit integers where
         // each active bit represents whether or not a piece is located there.
         // This allows for fast mutations through bitwise operations.
         // * ref: https://www.chessprogramming.org/Bitboards
-        public unsafe fixed ulong Bitboards[16];
+        private unsafe fixed ulong Bitboards[16];
 
-        public unsafe fixed byte MailBox[64];
+        private unsafe fixed byte MailBox[64];
 
         // Pieces are represented with 4 bits where the first three bits represent the
         // piece type and the fourth bit represents the color. Because of this, sideToMove
@@ -27,7 +38,8 @@ namespace Biasfish.Core
         // Castling rights are represented with 4 bits with the following format:
         // (black queenside)(black kingside)(white queenside)(white kingside)
         public int castlingRights;
-        // TODO: halfMoveClock will be used to track the 50 move rule.
+
+        // TODO: This will be used for 50-move rule
         public int halfMoveClock;
 
         // TODO: key will be used for zobrist hashing
@@ -81,6 +93,10 @@ namespace Biasfish.Core
                 {
                     MailBox[index] = Piece.Null;
                 }
+
+                // clear state history
+                stateHistory = new BoardState[1024];
+                plyCount = 0;
                 
                 // parse parts
                 string[] fenParts = fenString.Split(' ');
@@ -154,6 +170,166 @@ namespace Biasfish.Core
             return (castlingRights & CastlingRights.BlackQueenSide) != 0;
         }
 
+        // ! The following was written by Gemini
+        public void Pop(Move move)
+        {
+            unsafe
+            {
+                // 1. Restore previous metadata state
+                plyCount--;
+                BoardState previousState = stateHistory[plyCount];
+                currEpSquare   = previousState.EpSquare;
+                castlingRights = previousState.CastlingRights;
+                halfMoveClock  = previousState.HalfmoveClock;
+
+                // 2. Revert the side to move to the player who actually made the move
+                sideToMove = Piece.FlipColor(sideToMove);
+
+                // 3. Route to the appropriate unmake handler based on move flags
+                if      (Flags.IsQuiet(move.Flags))          UnmakeQuiet(move);
+                else if (Flags.IsCaptureOnly(move.Flags))    UnmakeCapture(move, previousState.CapturedPiece);
+                else if (Flags.IsDoublePawnPush(move.Flags)) UnmakeQuiet(move); // Double pawn push unmake is mechanically identical to a quiet move
+                else if (Flags.IsKingCastle(move.Flags))     UnmakeKingCastle();
+                else if (Flags.IsQueenCastle(move.Flags))    UnmakeQueenCastle();
+                else if (Flags.IsPromotion(move.Flags))      UnmakePromotion(move, previousState.CapturedPiece);
+                else if (Flags.IsEnPassant(move.Flags))      UnmakeEnPassant(move);
+            }
+        }
+
+        private unsafe void UnmakeQuiet(Move move)
+        {
+            int pieceType = PieceAt(move.ToSquare);
+
+            // Revert bitboards using XOR
+            Bitboards[pieceType]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+            // Revert mailbox
+            MailBox[move.FromSquare] = (byte)pieceType;
+            MailBox[move.ToSquare]   = Piece.Null;
+        }
+
+        private unsafe void UnmakeCapture(Move move, int capturedPiece)
+        {
+            int pieceType = PieceAt(move.ToSquare);
+            int enemyColor = Piece.FlipColor(sideToMove);
+
+            // Move the attacking piece back
+            Bitboards[pieceType]  ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+            // Restore the captured piece
+            Bitboards[capturedPiece] ^= Masks.Square[move.ToSquare];
+            Bitboards[enemyColor]    ^= Masks.Square[move.ToSquare];
+
+            // Revert mailbox
+            MailBox[move.FromSquare] = (byte)pieceType;
+            MailBox[move.ToSquare]   = (byte)capturedPiece;
+        }
+
+        private unsafe void UnmakeKingCastle()
+        {
+            if (sideToMove == Piece.White)
+            {
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.G1];
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F1] | Masks.Square[Squares.H1];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.E1] | Masks.Square[Squares.F1] | Masks.Square[Squares.G1] | Masks.Square[Squares.H1];
+
+                MailBox[Squares.E1] = (byte)(Piece.Kings | sideToMove);
+                MailBox[Squares.F1] = Piece.Null;
+                MailBox[Squares.G1] = Piece.Null;
+                MailBox[Squares.H1] = (byte)(Piece.Rooks | sideToMove);
+            }
+            else
+            {
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.G8];
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.F8] | Masks.Square[Squares.H8];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.E8] | Masks.Square[Squares.F8] | Masks.Square[Squares.G8] | Masks.Square[Squares.H8];
+
+                MailBox[Squares.E8] = (byte)(Piece.Kings | sideToMove);
+                MailBox[Squares.F8] = Piece.Null;
+                MailBox[Squares.G8] = Piece.Null;
+                MailBox[Squares.H8] = (byte)(Piece.Rooks | sideToMove);
+            }
+        }
+
+        private unsafe void UnmakeQueenCastle()
+        {
+            if (sideToMove == Piece.White)
+            {
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.A1] | Masks.Square[Squares.D1];
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.C1] | Masks.Square[Squares.E1];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.A1] | Masks.Square[Squares.C1] | Masks.Square[Squares.E1] | Masks.Square[Squares.D1];
+
+                MailBox[Squares.A1] = (byte)(Piece.Rooks | sideToMove);
+                MailBox[Squares.C1] = Piece.Null;
+                MailBox[Squares.D1] = Piece.Null;
+                MailBox[Squares.E1] = (byte)(Piece.Kings | sideToMove);
+            }
+            else
+            {
+                Bitboards[Piece.Rooks | sideToMove] ^= Masks.Square[Squares.A8] | Masks.Square[Squares.D8];
+                Bitboards[Piece.Kings | sideToMove] ^= Masks.Square[Squares.C8] | Masks.Square[Squares.E8];
+                Bitboards[sideToMove] ^= Masks.Square[Squares.A8] | Masks.Square[Squares.C8] | Masks.Square[Squares.E8] | Masks.Square[Squares.D8];
+
+                MailBox[Squares.A8] = (byte)(Piece.Rooks | sideToMove);
+                MailBox[Squares.C8] = Piece.Null;
+                MailBox[Squares.D8] = Piece.Null;
+                MailBox[Squares.E8] = (byte)(Piece.Kings | sideToMove);
+            }
+        }
+
+        private unsafe void UnmakePromotion(Move move, int capturedPiece)
+        {
+            int promotedPiece = PieceAt(move.ToSquare);
+            int pawnType = Piece.Pawns | sideToMove;
+
+            // Remove the promoted piece from the destination square
+            Bitboards[promotedPiece] ^= Masks.Square[move.ToSquare];
+            
+            // Add the pawn back to the origin square
+            Bitboards[pawnType] ^= Masks.Square[move.FromSquare];
+            
+            // Shift the color occupancy back
+            Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+            MailBox[move.FromSquare] = (byte)pawnType;
+            MailBox[move.ToSquare]   = Piece.Null;
+
+            // If it was a capture-promotion, restore the captured piece
+            if (Flags.IsCapture(move.Flags))
+            {
+                int enemyColor = Piece.FlipColor(sideToMove);
+                Bitboards[capturedPiece] ^= Masks.Square[move.ToSquare];
+                Bitboards[enemyColor]    ^= Masks.Square[move.ToSquare];
+                
+                MailBox[move.ToSquare] = (byte)capturedPiece;
+            }
+        }
+
+        private unsafe void UnmakeEnPassant(Move move)
+        {
+            int captureSquare = (sideToMove == Piece.White) ? move.ToSquare - 8 : move.ToSquare + 8;
+            int pawnType = Piece.Pawns | sideToMove;
+            
+            int enemyColor = Piece.FlipColor(sideToMove);
+            int enemyPawnType = Piece.Pawns | enemyColor;
+
+            // Move hero pawn back
+            Bitboards[pawnType]   ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+            Bitboards[sideToMove] ^= Masks.Square[move.FromSquare] | Masks.Square[move.ToSquare];
+
+            // Restore the captured enemy pawn
+            Bitboards[enemyPawnType] ^= Masks.Square[captureSquare];
+            Bitboards[enemyColor]    ^= Masks.Square[captureSquare];
+
+            // Revert mailbox
+            MailBox[move.FromSquare] = (byte)pawnType;
+            MailBox[move.ToSquare]   = Piece.Null;
+            MailBox[captureSquare]   = (byte)enemyPawnType;
+        }
+        // ! End of Gemini code
+
         /// <summary>
         /// Plays a given move.
         /// </summary>
@@ -162,6 +338,16 @@ namespace Biasfish.Core
         {
             unsafe
             {
+                // save the current state in the state history
+                stateHistory[plyCount] = new BoardState
+                {
+                    EpSquare = currEpSquare,
+                    CastlingRights = castlingRights,
+                    HalfmoveClock = halfMoveClock,
+                    CapturedPiece = PieceAt(move.ToSquare)
+                };
+                plyCount++;
+
                 // parse move data
                 int pieceType = PieceAt(move.FromSquare);
 

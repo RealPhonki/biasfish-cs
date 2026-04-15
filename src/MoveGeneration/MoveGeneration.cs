@@ -1,22 +1,83 @@
+using System.Drawing;
 using System.Numerics;
 
 namespace Biasfish.Core
 {
     public static class MoveGeneration
     {
-        public static bool IsLegal(Move move)
+        public static void GetLegalMoves(ref Board board, ref MoveList moveList)
         {
-            // case 1 - king moves
+            // get pseudo legal moves
+            Span<Move> memoryBuffer = stackalloc Move[256];
+            MoveList pseudoLegalMoves = new MoveList(memoryBuffer);
+            GetPseudoLegal(ref board, ref moveList);
 
-            // case 2 - double check
+            int sideToMove = board.sideToMove;
+            for (int i = 0; i < pseudoLegalMoves.count; i++)
+            {
+                Move move = pseudoLegalMoves[i];
 
-            // case 3 - single check
+                // play the move (this increments sideToMove)
+                board.Push(move);
 
-            // case 4 - the piece is pinned
+                ulong kings = board.Get(Piece.Kings | sideToMove);
+                int kingSquare = BitOperations.TrailingZeroCount(kings);
+                if (!IsSquareAttacked(ref board, kingSquare, sideToMove))
+                {
+                    moveList.Add(move);
+                }
 
-            // case 5 - en passant case
-            
-            return true;
+                board.Pop(move);
+            }
+        }
+
+        public static bool IsSquareAttacked(ref Board board, int square, int sideToMove)
+        {
+            ulong occupied = board.GetOccupied();
+            int enemyColor = Piece.FlipColor(sideToMove);
+
+            // check pawn attacks
+            ulong targetBb = 1UL << square;
+
+            if (enemyColor == Piece.White)
+            {
+                // White pawns attack "up", so we shift the target square "down" to see if it hits a white pawn
+                ulong attackers = ((targetBb >> 7) & Masks.NotFileH) | ((targetBb >> 9) & Masks.NotFileA);
+                if ((attackers & board.Get(Piece.Pawns | Piece.White)) != 0) return true;
+            }
+            else
+            {
+                // Black pawns attack "down", so we shift the target square "up" to see if it hits a black pawn
+                ulong attackers = ((targetBb << 7) & Masks.NotFileH) | ((targetBb << 9) & Masks.NotFileA);
+                if ((attackers & board.Get(Piece.Pawns | Piece.Black)) != 0) return true;
+            }
+
+            // check knight attacks
+            if ((Knights.KnightAttacks[square] & board.Get(Piece.Knights | enemyColor)) != 0)
+            {
+                return true;
+            }
+
+            // check knight attacks
+            if ((Kings.KingAttacks[square] & board.Get(Piece.Kings | enemyColor)) != 0)
+            {
+                return true;
+            }
+
+            // check bishop attacks
+            ulong bishopAttacks = Bishops.GetAttackBitboard(square, occupied);
+            if ((bishopAttacks & (board.Get(Piece.Bishops | enemyColor) | board.Get(Piece.Queens | enemyColor))) != 0)
+            {
+                return true;
+            }
+
+            ulong rookAttacks = Rooks.GetAttackBitboard(square, occupied);
+            if ((rookAttacks & (board.Get(Piece.Rooks | enemyColor) | board.Get(Piece.Queens | enemyColor))) != 0)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static void GetPseudoLegal(ref Board board, ref MoveList moveList)
@@ -32,7 +93,7 @@ namespace Biasfish.Core
         public static void SerializeMoves(ref Board board, ref MoveList moveList, ulong attackBitboard, int fromSquare)
         {
             ulong enemy = board.Get(Piece.FlipColor(board.sideToMove));
-            ulong empty = ~board.Get(Piece.Any);
+            ulong empty = ~board.GetOccupied();
 
             ulong captureMoves = attackBitboard & enemy;
             while (captureMoves != 0)
