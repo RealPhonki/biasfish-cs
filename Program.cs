@@ -1,4 +1,5 @@
 ﻿using Biasfish.Core;
+using Biasfish.MoveGeneration;
 
 namespace Biasfish
 {
@@ -33,7 +34,7 @@ namespace Biasfish
             // get legal moves
             Span<Move> memoryBuffer = stackalloc Move[256];
             MoveList moveList = new MoveList(memoryBuffer);
-            MoveGeneration.GetLegalMoves(ref board, ref moveList);
+            MoveGeneration.MoveGeneration.GetLegalMoves(ref board, ref moveList);
             for (int i = 0; i < moveList.count; i++)
             {
                 board.Push(moveList[i]);

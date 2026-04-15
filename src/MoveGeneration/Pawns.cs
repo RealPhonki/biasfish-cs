@@ -1,6 +1,7 @@
 using System.Numerics;
+using Biasfish.Core;
 
-namespace Biasfish.Core
+namespace Biasfish.MoveGeneration
 {
     public static class Pawns
     {

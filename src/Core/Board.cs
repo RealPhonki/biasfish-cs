@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 
 namespace Biasfish.Core
 {

@@ -1,10 +1,11 @@
-using System.Drawing;
 using System.Numerics;
+using Biasfish.Core;
 
-namespace Biasfish.Core
+namespace Biasfish.MoveGeneration
 {
     public static class MoveGeneration
     {
+        // TODO: Castling into attacked squares
         public static void GetLegalMoves(ref Board board, ref MoveList moveList)
         {
             // get pseudo legal moves
