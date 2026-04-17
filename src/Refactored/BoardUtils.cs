@@ -10,12 +10,12 @@ namespace Biasfish.V2
         private int castlingRights;
         private int halfMoveClock;
         private int fullMoveClock;
-
-        public ulong Get(int piece)
+        
+        public int EncodingAt(int square)
         {
             unsafe
             {
-                return Bitboards[piece];
+                return MailBox[square];
             }
         }
 
@@ -23,7 +23,7 @@ namespace Biasfish.V2
         {
             unsafe
             {
-                return MailBox[square];
+                return Piece.Type(MailBox[square]);
             }
         }
 
@@ -33,7 +33,7 @@ namespace Biasfish.V2
             {
                 Bitboards[piece] |= 1UL << square;
                 Bitboards[color] |= 1UL << square;
-                MailBox[square] = (byte)piece;
+                MailBox[square] = Piece.Encode(piece, color);
             }
         }
 

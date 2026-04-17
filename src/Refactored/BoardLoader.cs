@@ -108,11 +108,6 @@ namespace Biasfish.V2
                     file++;
                 }
             }
-
-            foreach (int piece in Piece.PieceTypes)
-            {
-                Debug.PrintBB(Get(piece));
-            }
         }
 
         private void ParseSideToMove(string fenString)
