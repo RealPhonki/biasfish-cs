@@ -8,6 +8,9 @@ namespace Biasfish
         {
             // initialize board
             Board board = new Board();
+
+            board.Push(new Move(Squares.E2, Squares.E4, 0));
+
             Debug.PrintBoard(board);
         }
     }

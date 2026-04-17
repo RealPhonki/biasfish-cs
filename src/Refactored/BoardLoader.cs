@@ -103,7 +103,7 @@ namespace Biasfish.V2
                     int color = PieceColorFromSymbol(symbol);
                     int square = rank * 8 + file;
 
-                    AddPiece(piece, color, square);
+                    AddPiece(piece, square, color);
 
                     file++;
                 }
