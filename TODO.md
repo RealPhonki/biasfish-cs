@@ -1,9 +1,10 @@
 # TODO - Features
+- Fix new Debug.cs
+- Completely refactor Board.cs
+- Correct castling into attacked squares issue
 - Correct Perft results
 - Load FEN metadata
 - Add check detection
-- Get attack bitboard
-- Don't generate king moves onto attacked squares
 - Calculate 50 move rule
 - Calculate 3-fold
 - Calculate insufficient
