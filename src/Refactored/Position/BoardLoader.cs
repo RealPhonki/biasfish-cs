@@ -4,15 +4,15 @@ namespace Biasfish.V2
     {
         public Board()
         {
-            LoadFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            Set("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         }
 
         public Board(string fenString)
         {
-            LoadFen(fenString);
+            Set(fenString);
         }
 
-        public void LoadFen(string fenString)
+        public void Set(string fenString)
         {
             ClearBoardState();
             // TODO: ClearStateHistory();
@@ -21,13 +21,13 @@ namespace Biasfish.V2
 
             ParseBoardState(fenParts[0]);
             ParseSideToMove(fenParts[1]);
-            ParseCastlingRights(fenParts[2]);
+            // TODO: ParseCastlingRights(fenParts[2]);
             // TODO: ParseEpSquare(fenParts[3]);
             // TODO: ParseHalfMoveClock(fenParts[4]);
             // TODO: ParseFullMoveClock(fenParts[5]);
         }
 
-        private static int PieceTypeFromSymbol(char symbol)
+        private static Piece PieceTypeFromSymbol(char symbol)
         {
             return symbol switch
             {
@@ -47,22 +47,22 @@ namespace Biasfish.V2
             };
         }
 
-        private static int PieceColorFromSymbol(char symbol)
+        private static Color PieceColorFromSymbol(char symbol)
         {
             return symbol switch
             {
-                'P' => Piece.White,
-                'N' => Piece.White,
-                'B' => Piece.White,
-                'R' => Piece.White,
-                'Q' => Piece.White,
-                'K' => Piece.White,
-                'p' => Piece.Black,
-                'n' => Piece.Black,
-                'b' => Piece.Black,
-                'r' => Piece.Black,
-                'q' => Piece.Black,
-                'k' => Piece.Black,
+                'P' => Color.White,
+                'N' => Color.White,
+                'B' => Color.White,
+                'R' => Color.White,
+                'Q' => Color.White,
+                'K' => Color.White,
+                'p' => Color.Black,
+                'n' => Color.Black,
+                'b' => Color.Black,
+                'r' => Color.Black,
+                'q' => Color.Black,
+                'k' => Color.Black,
                 _ => throw new ArgumentException($"Invalid FEN character: {symbol}")
             };
         }
@@ -71,7 +71,7 @@ namespace Biasfish.V2
         {
             for (int square = 0; square < 64; square++)
             {
-                RemovePiece(square);
+                RemovePiece((Square)square);
             }
         }
 
@@ -99,11 +99,11 @@ namespace Biasfish.V2
 
                 else
                 {
-                    int piece = PieceTypeFromSymbol(symbol);
-                    int color = PieceColorFromSymbol(symbol);
-                    int square = rank * 8 + file;
+                    Piece piece = PieceTypeFromSymbol(symbol);
+                    Color color = PieceColorFromSymbol(symbol);
+                    Square square = (Square)(rank * 8 + file);
 
-                    AddPiece(piece, square, color);
+                    AddPiece(piece, color, square);
 
                     file++;
                 }
@@ -112,16 +112,12 @@ namespace Biasfish.V2
 
         private void ParseSideToMove(string fenString)
         {
-            sideToMove = fenString == "w" ? Piece.White : Piece.Black;
+            sideToMove = fenString == "w" ? Color.White : Color.Black;
         }
 
         private void ParseCastlingRights(string fenString)
         {
-            castlingRights = 0;
-            if (fenString.Contains('K')) castlingRights |= CastlingRights.WhiteKingSide;
-            if (fenString.Contains('Q')) castlingRights |= CastlingRights.WhiteQueenSide;
-            if (fenString.Contains('k')) castlingRights |= CastlingRights.BlackKingSide;
-            if (fenString.Contains('q')) castlingRights |= CastlingRights.BlackQueenSide;
+            throw new NotImplementedException();
         }
 
         private void ParseEpSquare(string fenString)

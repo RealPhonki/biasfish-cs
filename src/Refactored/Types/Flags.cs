@@ -1,6 +1,6 @@
 namespace Biasfish.V2
 {
-    public static class Flags
+    public class Flags
     {
         public const int Quiet = 0;
         public const int DoublePawnPush = 1;
