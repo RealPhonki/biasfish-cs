@@ -1,7 +1,6 @@
 using System.Numerics;
-using Biasfish.Legacy;
 
-namespace Biasfish.MoveGeneration
+namespace Biasfish.Legacy
 {
     public static class Queens
     {

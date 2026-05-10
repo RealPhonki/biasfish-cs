@@ -1,12 +1,22 @@
-# TODO - Features
-- Correct Perft results
-- Load FEN metadata
-- Add check detection
-- Get attack bitboard
-- Don't generate king moves onto attacked squares
-- Calculate 50 move rule
-- Calculate 3-fold
-- Calculate insufficient
+# TODO
 
-# TODO - Optimizations
-- Use magic bitboards for sliding piece move generation
+## Datatypes
+- Implement File/Rank
+- Implement Color
+- implement PieceTypes
+- Implement Direction
+
+## Bit manipulation Bitboard.cs
+- popcount
+- lsb
+- msb
+- more than one
+- shift<d>
+- pawn attacks<color>
+- rank/file bb
+- square bb
+
+## Position.cs
+- bycolorbb
+- bytypebb
+- board (mailbox)
