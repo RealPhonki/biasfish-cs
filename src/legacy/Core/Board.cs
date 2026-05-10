@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Biasfish.Core
+namespace Biasfish.Legacy
 {
     public struct BoardState
     {

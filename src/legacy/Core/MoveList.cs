@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Biasfish.Core
+namespace Biasfish.Legacy
 {
     /// <summary>
     /// Represents a set of moves and handles all related metadata.

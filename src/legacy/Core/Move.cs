@@ -1,4 +1,4 @@
-namespace Biasfish.Core
+namespace Biasfish.Legacy
 {
     /// <summary>
     /// Represents a move and metadata with a 16 bit value.

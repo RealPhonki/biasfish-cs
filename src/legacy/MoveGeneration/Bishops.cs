@@ -1,5 +1,5 @@
 using System.Numerics;
-using Biasfish.Core;
+using Biasfish.Legacy;
 
 namespace Biasfish.MoveGeneration
 {

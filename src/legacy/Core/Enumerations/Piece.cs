@@ -1,4 +1,4 @@
-namespace Biasfish.Core
+namespace Biasfish.Legacy
 {
     public static class Piece
     {
