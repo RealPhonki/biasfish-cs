@@ -25,13 +25,14 @@ namespace Biasfish.Core
 
     public static class PieceExtensions
     {
-        private const string PieceToChar = " PNBRQK pnbrqk";
+        private const string PieceToSymbol = " ♟♞♝♜♛♚ ♙♘♗♖♕♔";
+        private const string PieceToChar   = " PNBRQK pnbrqk";
         
         extension(Piece)
         {
-
             public static Piece FromChar(char character) => (Piece)PieceToChar.IndexOf(character);
             public static char ToChar(Piece piece)       => PieceToChar[(int)piece];
+            public static char ToSymbol(Piece piece)     => PieceToSymbol[(int)piece];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

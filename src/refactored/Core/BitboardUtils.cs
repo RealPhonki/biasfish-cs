@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using Bitboard = ulong;
@@ -23,12 +24,14 @@ namespace Biasfish.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LSB(Bitboard bitboard)
         {
+            Debug.Assert(bitboard != 0, "Cannot find the LSB on an empty bitboard");
             return BitOperations.TrailingZeroCount(bitboard);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int MSB(Bitboard bitboard)
         {
+            Debug.Assert(bitboard != 0, "Cannot find the MSB on an empty bitboard");
             return 63 - BitOperations.LeadingZeroCount(bitboard);
         }
 
@@ -41,6 +44,8 @@ namespace Biasfish.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Bitboard Shift(Direction direction, Bitboard bitboard)
         {
+            Debug.Assert(Enum.IsDefined(typeof(Direction), direction), $"Invalid direction '{direction}'");
+
             return direction switch
             {
                 Direction.North     => bitboard << 8,

@@ -20,6 +20,7 @@ namespace Biasfish.Core
                 board[i] = (byte)Piece.NoPiece;
             }
 
+            // TODO: Use read-only span
             // validate fen
             string[] fenParts = fenString.Split(' ');
             if (fenParts.Length != 6)
@@ -58,6 +59,7 @@ namespace Biasfish.Core
                 // convert the symbol into a piece type
                 else
                 {
+                    // TODO: check if FromChar is inlineable
                     // parse symbol
                     Piece piece = Piece.FromChar(symbol);
                     int square = rank * 8 + file;
@@ -80,10 +82,20 @@ namespace Biasfish.Core
 
         private void SetCastlingRights(string fen)
         {
-            castlingRights = (fen[0] == 'K' ? CastlingRights.WhiteOO  : 0)
-                           | (fen[1] == 'Q' ? CastlingRights.WhiteOOO : 0)
-                           | (fen[2] == 'k' ? CastlingRights.BlackOO  : 0)
-                           | (fen[3] == 'q' ? CastlingRights.BlackOOO : 0);
+            castlingRights = 0;
+            if (fen == "-") return;
+
+            foreach (char character in fen)
+            {
+                castlingRights |= character switch
+                {
+                    'K' => CastlingRights.WhiteOO,
+                    'Q' => CastlingRights.WhiteOOO,
+                    'k' => CastlingRights.BlackOO,
+                    'q' => CastlingRights.BlackOOO,
+                    _   => 0
+                };
+            }
         }
 
         private void SetEPSquare(string fen)

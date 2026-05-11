@@ -7,6 +7,7 @@ namespace Biasfish
         static void Main(string[] args)
         {
             Position position = new Position();
+            Console.WriteLine(position);
         }
     }
 }
