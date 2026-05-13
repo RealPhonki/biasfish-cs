@@ -32,17 +32,22 @@ namespace Biasfish.Core
         {
             public static Piece FromChar(char character) => (Piece)PieceToChar.IndexOf(character);
             public static char ToChar(Piece piece)       => PieceToChar[(int)piece];
-            public static char ToSymbol(Piece piece)     => PieceToSymbol[(int)piece];
+            public static char ToSymbol(Piece piece)     => PieceToSymbol[(int)piece];[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            
+            public static Piece MakePiece(PieceType pieceType, Color color)
+            {
+                return (Piece)(((int)color << 3) | (int)pieceType);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PieceType TypeOf(this Piece piece)
+        public static PieceType Type(this Piece piece)
         {
             return (PieceType)((int)piece & 7);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Color GetColor(this Piece piece)
+        public static Color Color(this Piece piece)
         {
             return (Color)((int)piece >> 3);
         }

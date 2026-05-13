@@ -14,13 +14,4 @@ namespace Biasfish.Core
         AllPieces,   // 7 - 111
         PieceTypeNB,
     }
-
-    public static class PieceTypeExtensions
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Piece MakePiece(this PieceType pieceType, Color color)
-        {
-            return (Piece)(((int)color << 3) | (int)pieceType);
-        }
-    }
 }

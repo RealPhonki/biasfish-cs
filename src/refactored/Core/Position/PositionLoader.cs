@@ -24,24 +24,6 @@ namespace Biasfish.Core
             if (fenParts.Length > 5) SetFullMove(fenParts[5]);
         }
 
-        private void Clear()
-        {
-            for (int i = 0; i < (int)PieceType.PieceTypeNB; i++)
-            {
-                ByTypeBB[i] = 0;
-            }
-
-            for (int i = 0; i < (int)Color.ColorNB; i++)
-            {
-                ByColorBB[i] = 0;
-            }
-
-            for (int i = 0; i < (int)Square.SquareNB; i++)
-            {
-                board[i] = (byte)Piece.NoPiece;
-            }
-        }
-
         private void SetBoard(string fen)
         {
             // start on A8 moving rightwards
@@ -74,20 +56,18 @@ namespace Biasfish.Core
                     // TODO: check if FromChar is inlineable
                     // parse symbol
                     Piece piece = Piece.FromChar(symbol);
-                    int square = rank * 8 + file;
+                    Square square = (Square)(rank * 8 + file);
 
-                    // place pieces
-                    ByColorBB[(int)piece.GetColor()] |= Masks.Square[square];
-                    ByTypeBB[(int)piece.TypeOf()]    |= Masks.Square[square];
-                    board[square] = (byte)piece;
+                    // add piece
+                    PutPiece(piece, square);
 
                     // move to the next file
                     file++;
                 }
             }
 
-            Bitboard whiteKing = ByTypeBB[(int)PieceType.King] & ByColorBB[(int)Color.White];
-            Bitboard blackKing = ByTypeBB[(int)PieceType.King] & ByColorBB[(int)Color.Black];
+            Bitboard whiteKing = this.Pieces(Piece.WhiteKing);
+            Bitboard blackKing = this.Pieces(Piece.BlackKing);
 
             if (BitboardUtils.MoreThanOne(whiteKing)) throw new ArgumentException($"Invalid FEN, multiple white kings found");
             if (whiteKing == 0UL) throw new ArgumentException($"Invalid FEN, missing white king");

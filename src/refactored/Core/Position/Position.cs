@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using System.Dynamic;
+using System.Runtime.CompilerServices;
 using Bitboard = ulong;
 
 namespace Biasfish.Core
@@ -11,6 +11,37 @@ namespace Biasfish.Core
         private fixed byte board[(int)Square.SquareNB];
         private Color sideToMove;
         private int castlingRights;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Bitboard Pieces()
+        {
+            return ByColorBB[(int)Color.White] | ByColorBB[(int)Color.Black];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Bitboard Pieces(Color color)
+        {
+            return ByColorBB[(int)color];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Bitboard Pieces(PieceType pieceType)
+        {
+            return ByTypeBB[(int)pieceType];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Bitboard Pieces(PieceType pieceType, Color color)
+        {
+            return Pieces(pieceType) & Pieces(color);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Bitboard Pieces(Piece piece)
+        {
+            return Pieces(piece.Type(), piece.Color());
+        }
+
 
         public Position()
         {
