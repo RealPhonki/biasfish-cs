@@ -4,29 +4,29 @@ namespace Biasfish.Core
 {
     public enum Piece : int
     {
-        NoPiece,
+        NoPiece,                            //  0 - 0000
 
-        WhitePawn   = PieceType.Pawn,
-        WhiteKnight = PieceType.Knight,
-        WhiteBishop = PieceType.Bishop,
-        WhiteRook   = PieceType.Rook,
-        WhiteQueen  = PieceType.Queen,
-        WhiteKing   = PieceType.King,
+        WhitePawn   = PieceType.Pawn,       //  1 - 0001
+        WhiteKnight = PieceType.Knight,     //  2 - 0010
+        WhiteBishop = PieceType.Bishop,     //  3 - 0011
+        WhiteRook   = PieceType.Rook,       //  4 - 0100
+        WhiteQueen  = PieceType.Queen,      //  5 - 0101
+        WhiteKing   = PieceType.King,       //  6 - 0110
 
-        BlackPawn   = PieceType.Pawn   + 8,
-        BlackKnight = PieceType.Knight + 8,
-        BlackBishop = PieceType.Bishop + 8,
-        BlackRook   = PieceType.Rook   + 8,
-        BlackQueen  = PieceType.Queen  + 8,
-        BlackKing   = PieceType.King   + 8,
+        BlackPawn   = PieceType.Pawn   + 8, //  9 - 1001
+        BlackKnight = PieceType.Knight + 8, // 10 - 1010
+        BlackBishop = PieceType.Bishop + 8, // 11 - 1011
+        BlackRook   = PieceType.Rook   + 8, // 12 - 1100
+        BlackQueen  = PieceType.Queen  + 8, // 13 - 1101
+        BlackKing   = PieceType.King   + 8, // 14 - 1110
 
         PieceNB = 16,
     }
 
     public static class PieceExtensions
     {
-        private const string PieceToSymbol = " ♟♞♝♜♛♚ ♙♘♗♖♕♔";
-        private const string PieceToChar   = " PNBRQK pnbrqk";
+        private const string PieceToSymbol = " ♟♞♝♜♛♚  ♙♘♗♖♕♔";
+        private const string PieceToChar   = " PNBRQK  pnbrqk";
         
         extension(Piece)
         {

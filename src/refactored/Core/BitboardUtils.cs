@@ -59,5 +59,28 @@ namespace Biasfish.Core
                 _ => 0,
             };
         }
+
+        public static void Visualize(Bitboard bitboard)
+        {
+            Console.WriteLine("  +---+---+---+---+---+---+---+---+");
+            for (int rank = 7; rank >= 0; rank--)
+            {
+                Console.Write($"{rank + 1} | ");
+                for (int file = 0; file < 8; file++)
+                {
+                    int square = rank * 8 + file;
+                    if ((bitboard & Masks.Square[square]) != 0)
+                    {
+                        Console.Write($"1 | ");
+                    }
+                    else
+                    {
+                        Console.Write($"  | ");
+                    }
+                }
+                Console.WriteLine("\n  +---+---+---+---+---+---+---+---+");
+            }
+            Console.WriteLine("    a   b   c   d   e   f   g   h   ");
+        }
     }
 }
