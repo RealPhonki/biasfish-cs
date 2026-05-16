@@ -28,6 +28,12 @@ namespace Biasfish.Core
         [Conditional("DEBUG")]
         public void ValidateSquare(Piece piece, Square square)
         {
+            // ensure square is within bounds
+            if (!Enum.IsDefined(typeof(Square), square))
+            {
+                throw new ArgumentOutOfRangeException($"Illegal square '{square}'");
+            }
+
             // search mailbox
             if ((Piece)board[(int)square] != piece)
             {
@@ -50,6 +56,12 @@ namespace Biasfish.Core
         [Conditional("DEBUG")]
         public void ValidateEmptySquare(Square square)
         {
+            // ensure square is within bounds
+            if (!Enum.IsDefined(typeof(Square), square))
+            {
+                throw new ArgumentOutOfRangeException($"Invalid square caught: '{square}");
+            }
+
             // search mailbox
             if ((Piece)board[(int)square] != Piece.NoPiece)
             {

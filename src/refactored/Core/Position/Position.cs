@@ -11,6 +11,7 @@ namespace Biasfish.Core
         private fixed byte board[(int)Square.SquareNB];
         private Color sideToMove;
         private int castlingRights;
+        private Square EpSquare;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Bitboard Pieces()

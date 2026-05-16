@@ -19,7 +19,7 @@ namespace Biasfish.Core
             SetBoard(fenParts[0]);
             SetSideToMove(fenParts[1]);
             SetCastlingRights(fenParts[2]);
-            SetEPSquare(fenParts[3]);
+            SetEpSquare(fenParts[3]);
             if (fenParts.Length > 4) SetHalfMove(fenParts[4]);
             if (fenParts.Length > 5) SetFullMove(fenParts[5]);
         }
@@ -27,36 +27,40 @@ namespace Biasfish.Core
         private void SetBoard(string fen)
         {
             // start on A8 moving rightwards
-            int rank = 7;
-            int file = 0;
+            Rank rank = Rank.Rank8;
+            File file = File.FileA;
             foreach (char symbol in fen)
             {
                 // move down one rank
-                if (symbol == '/' && file <= 8)
+                if (symbol == '/')
                 {
                     rank--;
-                    file = 0;
-                    continue;
-                }
-
-                if (file > 7 || rank < 0)
-                {
-                    throw new ArgumentException($"Invalid FEN, pointer hit file {file}, rank {rank + 1}: '{fen}");
+                    file = File.FileA;
                 }
 
                 // convert the symbol to an int and move right
-                if (char.IsDigit(symbol))
+                else if (char.IsDigit(symbol))
                 {
-                    file += symbol - '0';
+                    int skip = symbol - '0';
+                    if (skip < 1 || skip > (int)File.FileNB || file + skip > File.FileNB)
+                    {
+                        throw new ArgumentException($"Invalid FEN, pointer hit file {(int)file + skip}, rank {(int)rank + 1}: '{fen}");
+                    }
+                    file += skip;
                 }
 
                 // convert the symbol into a piece type
                 else
                 {
+                    if (file + 1 > File.FileNB)
+                    {
+                        throw new ArgumentException($"Invalid FEN, pointer hit file {(int)file + 1}, rank {(int)rank + 1}: '{fen}");
+                    }
+
                     // TODO: check if FromChar is inlineable
                     // parse symbol
                     Piece piece = Piece.FromChar(symbol);
-                    Square square = (Square)(rank * 8 + file);
+                    Square square = Square.MakeSquare(rank, file);
 
                     // add piece
                     PutPiece(piece, square);
@@ -77,7 +81,7 @@ namespace Biasfish.Core
 
         private void SetSideToMove(string fen)
         {
-            if (!"wb".Contains(fen))
+            if (fen != "w" && fen != "b")
             {
                 throw new ArgumentException($"Invalid FEN, illegal character for side to move: '{fen}'");
             }
@@ -86,12 +90,12 @@ namespace Biasfish.Core
 
         private void SetCastlingRights(string fen)
         {
-            castlingRights = 0;
+            castlingRights = CastlingRights.NoCastling;
             if (fen == "-") return;
 
             foreach (char character in fen)
             {
-                if (!fen.All(character => "KQkq-".Contains(character)))
+                if (!"KQkq".Contains(character))
                 {
                     throw new ArgumentException($"Invalid FEN, illegal character '{character}' in castling rights: '{fen}'");
                 }
@@ -107,9 +111,24 @@ namespace Biasfish.Core
             }
         }
 
-        private void SetEPSquare(string fen)
+        private void SetEpSquare(string fen)
         {
+            if (fen == "-") return;
             
+            if (fen.Length != 2)
+            {
+                throw new ArgumentException($"Invalid FEN, illegal format for ep square: '{fen}'");
+            }
+            if (!"abcdefgh".Contains(fen[0]))
+            {
+                throw new ArgumentException($"Invalid FEN, illegal character '{fen[0]}' for rank in ep square: '{fen}'");
+            }
+            if (!"12345678".Contains(fen[1]))
+            {
+                throw new ArgumentException($"Invalid FEN, illegal character '{fen[1]}' for file in ep square: '{fen}'");
+            }
+
+            EpSquare = Square.FromUci(fen);
         }
 
         private void SetHalfMove(string fen)

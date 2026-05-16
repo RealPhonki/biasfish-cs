@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Biasfish.Core
 {
     public enum Square : int
@@ -13,5 +15,25 @@ namespace Biasfish.Core
         
         SquareNone,
         SquareNB = 64
+    }
+
+    public static class SquareExtensions
+    {
+        extension(Square)
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static Square MakeSquare(Rank rank, File file)
+            {
+                return (Square)(((int)rank << 3) + (int)file);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static Square FromUci(string uciString)
+            {
+                File file = File.FromChar(uciString[0]);
+                Rank rank = Rank.FromChar(uciString[1]);
+                return MakeSquare(rank, file);
+            }
+        }
     }
 }
