@@ -6,13 +6,17 @@ namespace Biasfish.Core
 {
     public unsafe partial struct Position
     {
+        // Board state is represented with ByTypeBB, ByColorBB, and board.
+        // ByTypeBB is a fixed array of bitboards where each bitboard represents a piece type.
+        // ByColorBB is a fixed array of two bitboards: one for white occupancy and one for black occupancy.
+        // board is an array of 64 pieces where the type and color are encoded into each slot.
         private fixed Bitboard ByTypeBB[(int)PieceType.PieceTypeNB];
         private fixed Bitboard ByColorBB[(int)Color.ColorNB];
         private fixed byte board[(int)Square.SquareNB];
         private Color sideToMove;
         private int castlingRights;
         private Square EpSquare;
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Bitboard Pieces()
         {
@@ -42,7 +46,6 @@ namespace Biasfish.Core
         {
             return Pieces(piece.Type(), piece.Color());
         }
-
 
         public Position()
         {

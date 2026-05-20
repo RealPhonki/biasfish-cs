@@ -4,9 +4,13 @@ namespace Biasfish.Core
 {
     public unsafe partial struct Position
     {
+        /// <summary>
+        /// Loads board state and metadata from the given fen string.
+        /// </summary>
+        /// <param name="fenString"></param>
+        /// <exception cref="ArgumentException"></exception>
         public void Set(string fenString)
         {
-
             // TODO: Use read-only span
             string[] fenParts = fenString.Split(' ');
             if (fenParts.Length < 4 || fenParts.Length > 6)
@@ -24,6 +28,11 @@ namespace Biasfish.Core
             if (fenParts.Length > 5) SetFullMove(fenParts[5]);
         }
 
+        /// <summary>
+        /// Mutates byTypeBB, byColorBB, and board with the given fen sub-string
+        /// </summary>
+        /// <param name="fen"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void SetBoard(string fen)
         {
             // start on A8 moving rightwards
@@ -79,6 +88,11 @@ namespace Biasfish.Core
             if (blackKing == 0UL) throw new ArgumentException($"Invalid FEN, missing black king");
         }
 
+        /// <summary>
+        /// Mutates sideToMove with the given fen sub-string
+        /// </summary>
+        /// <param name="fen"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void SetSideToMove(string fen)
         {
             if (fen != "w" && fen != "b")
@@ -88,6 +102,11 @@ namespace Biasfish.Core
             sideToMove = fen == "w" ? Color.White : Color.Black;
         }
 
+        /// <summary>
+        /// Mutates castlingRights with the given fen sub-string
+        /// </summary>
+        /// <param name="fen"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void SetCastlingRights(string fen)
         {
             castlingRights = CastlingRights.NoCastling;
@@ -111,6 +130,11 @@ namespace Biasfish.Core
             }
         }
 
+        /// <summary>
+        /// Mutates EpSquare using the given fen sub-string
+        /// </summary>
+        /// <param name="fen"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void SetEpSquare(string fen)
         {
             if (fen == "-") return;
